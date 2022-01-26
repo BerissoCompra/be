@@ -36,7 +36,7 @@ class UsersController {
             if (usuarioExiste.length > 0) {
                 const data = JSON.stringify({ uid: usuarioExiste[0]._id });
                 const token = jsonwebtoken_1.default.sign(data, keys_1.default.seckey);
-                return res.status(200).json({ token });
+                return res.status(200).json({ token: token });
             }
             else {
                 return res.status(500).json({ error: 'El usuario y/o contraseña son incorrectos' });
@@ -101,12 +101,42 @@ class UsersController {
             const cliente = yield Cliente_1.default.findById(uid);
             if (cliente) {
                 const _a = cliente._doc, { password } = _a, rest = __rest(_a, ["password"]);
-                console.log(rest);
                 return res.status(200).json(rest);
             }
             else {
                 return res.status(404).json({ ok: 'No se encontro el comercio' });
             }
+        });
+    }
+    addFavorito(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const { comercio } = req.body;
+            let nuevosFavoritos = [];
+            let respuesta = false;
+            yield Cliente_1.default.findOne({ _id: id })
+                .then((client) => {
+                const existe = client.favoritos.filter((fav) => fav._id === comercio._id);
+                if (existe.length > 0) {
+                    nuevosFavoritos = client.favoritos.filter((fav) => fav._id != comercio._id);
+                    respuesta = false;
+                }
+                else {
+                    nuevosFavoritos = [...client.favoritos, comercio];
+                    respuesta = true;
+                }
+            })
+                .catch((err) => {
+                return res.status(404).json({ msg: 'No se encontro el cliente' });
+            });
+            yield Cliente_1.default.updateOne({ _id: id }, { favoritos: nuevosFavoritos })
+                .then((re) => {
+                console.log(re);
+                return res.status(200).json({ msg: respuesta });
+            })
+                .catch((err) => {
+                return res.status(404).json({ msg: 'No se encontro el cliente' });
+            });
         });
     }
 }

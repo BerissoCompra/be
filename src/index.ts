@@ -32,19 +32,20 @@ app.use('/api/pedidos',pedidosRoutes);
 app.use('/api/auth',usersRoutes);
 
 io.on('connection', (socket) => {
-    const idHandShake = socket.id;
     const {comercioId} = socket.handshake.query;    
-    socket.join(comercioId);
+    socket.join(comercioId as string);
+
+    console.log('Connected ', comercioId)
 
     socket.on('cliente', (res)=>{
         const data = res;
-        socket.broadcast.to(comercioId).emit('cliente', data);
+        socket.broadcast.to(comercioId as string).emit('cliente', data);
         console.log("EMMIT --------CLIENTE------------- ", comercioId)
     })
 
     socket.on('comercio', (res)=>{
         const data = res;
-        socket.broadcast.to(comercioId).emit('comercio', data);
+        socket.broadcast.to(comercioId as string).emit('comercio', data);
         console.log("EMMIT --------COMERCIO------------- ", comercioId)
     })
 });

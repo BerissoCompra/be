@@ -55,6 +55,9 @@ const comercioSchema = new Schema({
     contadorCalificaciones: {
         type: Number
     },
+    estrellas : {
+        type: Number
+    },
     costoEnvio: {
         type: Number
     }, 

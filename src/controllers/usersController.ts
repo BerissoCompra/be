@@ -11,7 +11,7 @@ class UsersController{
         if(usuarioExiste.length > 0){
             const data = JSON.stringify({uid: usuarioExiste[0]._id});
             const token = jwt.sign(data, keys.seckey)
-            return res.status(200).json({token});
+            return res.status(200).json({token: token});
         }
         else{
             return res.status(500).json({error: 'El usuario y/o contraseña son incorrectos'})
@@ -21,7 +21,7 @@ class UsersController{
     public async crearUsuario(req: Request, res: Response){
         const {email} = req.body;
         const usuarioExiste = await Usuario.find({email: email.toLowerCase()})
-        
+
         if(usuarioExiste.length > 0){
             return res.status(200).json({err: 'El email ingresado ya se encuentra registrado.'});
         }
@@ -73,12 +73,44 @@ class UsersController{
         const cliente = await Cliente.findById(uid)
         if(cliente){
             const {password, ...rest} = cliente._doc;
-            console.log(rest)
             return res.status(200).json(rest);
         }
         else{
             return res.status(404).json({ok: 'No se encontro el comercio'});
         }
+    }
+
+    public async addFavorito(req: any, res: Response){
+        const {id} = req.params;
+        const {comercio} = req.body;
+        let nuevosFavoritos: any[] = [];
+        let respuesta: boolean = false;
+        
+        await Cliente.findOne({_id: id})
+        .then((client: {favoritos: any[]})=>{
+            const existe = client.favoritos.filter((fav)=> fav._id === comercio._id);
+            if(existe.length > 0){
+                nuevosFavoritos = client.favoritos.filter((fav)=> fav._id != comercio._id);
+                respuesta = false;
+            }
+            else{
+                nuevosFavoritos = [...client.favoritos, comercio]
+                respuesta = true;
+            }
+        })
+        .catch((err)=>{
+            return res.status(404).json({msg: 'No se encontro el cliente'});
+        })
+
+        await Cliente.updateOne({_id: id}, {favoritos: nuevosFavoritos})
+        .then((re)=>{
+            console.log(re)
+            return res.status(200).json({msg: respuesta});
+        })
+        .catch((err)=>{
+            return res.status(404).json({msg: 'No se encontro el cliente'});
+        })
+
     }
  
 }

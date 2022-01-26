@@ -15,32 +15,7 @@ class ProductoController{
             return res.status(500).json({err: 'El comercio no se pudo crear correctamente.'});
         }
     }
-
-    public async obtenerProductos(req: any, res: Response): Promise<any>{
-        // const db = await connect();
-        // const {id} = req.params;
-        // const [[cat], []]: any = await db.query('SELECT id FROM catalogos WHERE comercioId = ? ', [id]);
-        // if(cat){   
-        //     const [producto]: any = await db.query('SELECT * FROM productos WHERE catalogoId = ?', [cat.id]);
-        //     if(producto){
-        //         return res.status(200).json(producto)
-        //     }
-        //     else{
-        //         return res.status(200).json({ok:"No posee productos"})
-        //     }      
-        // }
-        // else{
-        //     const [catalogo]: any = await db.query('INSERT INTO catalogos SET comercioId = ?', [id]);
-        //     if(catalogo){
-        //         const catalogoId = catalogo.insertId;
-        //         const [response]: any = await db.query('UPDATE comercios SET catalogoId = ? WHERE id = ?', [catalogoId,id]); 
-        //         if(response?.affectedRows > 0){
-        //             return res.status(200).send('catalogo creado');
-        //         }   
-        //     }
-        // }
-    }
-
+    
     public async elimiarProducto(req: any, res: Response): Promise<any>{
         const {id} = req.params;
         const producto = await ProductoModel.deleteOne({_id: id});

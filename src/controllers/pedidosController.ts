@@ -62,6 +62,17 @@ class PedidosController{
         }
     }
 
+    public async eliminarPedido(req: Request, res: Response){
+        const {id} = req.params;
+        const pedidoEliminado = await Pedido.deleteOne({_id: id})
+        .then((re)=>{
+            return res.status(200).json({msg: 'Pedido eliminado.'});
+        })
+        .catch((error)=>{
+            return res.status(500).json({msg: 'El pedido no se pudo eliminar correctamente.'});
+        })
+    }
+
  
 }
 

@@ -19,6 +19,7 @@ class PedidosRoutes {
         this.router.get('/comercio/:id/:estado', this.verifyToken, pedidosController_1.pedidosController.obtenerPedidosComercios);
         this.router.post('/:id', this.verifyToken, pedidosController_1.pedidosController.crearPedido);
         this.router.put('/:id', this.verifyToken, pedidosController_1.pedidosController.actualizarPedido);
+        this.router.delete('/:id', this.verifyToken, pedidosController_1.pedidosController.eliminarPedido);
     }
     verifyToken(req, res, next) {
         if (!req.headers.authorization)

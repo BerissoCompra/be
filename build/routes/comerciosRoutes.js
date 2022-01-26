@@ -17,7 +17,7 @@ class ComerciosRoutes {
         this.router.get('/', comercioController_1.comercioController.obtenerComercios);
         this.router.post('/new', comercioController_1.comercioController.crearComercio);
         this.router.get('/obtener', this.verifyToken, comercioController_1.comercioController.obtenerComerciosByUserId);
-        this.router.post('/filtrar', this.verifyToken, comercioController_1.comercioController.obtenerComerciosByFiltro);
+        this.router.post('/filtrar/:filtro', this.verifyToken, comercioController_1.comercioController.obtenerComerciosByFiltro);
         this.router.get('/:id', this.verifyToken, comercioController_1.comercioController.obtenerComerciosById);
         this.router.put('/:id', this.verifyToken, comercioController_1.comercioController.actualizarComercio);
         this.router.put('/calificar/:id', comercioController_1.comercioController.calificarComercio);

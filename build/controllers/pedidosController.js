@@ -76,5 +76,17 @@ class PedidosController {
             }
         });
     }
+    eliminarPedido(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const pedidoEliminado = yield Pedido_1.default.deleteOne({ _id: id })
+                .then((re) => {
+                return res.status(200).json({ msg: 'Pedido eliminado.' });
+            })
+                .catch((error) => {
+                return res.status(500).json({ msg: 'El pedido no se pudo eliminar correctamente.' });
+            });
+        });
+    }
 }
 exports.pedidosController = new PedidosController();

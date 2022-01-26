@@ -42,6 +42,9 @@ const ClienteSchema = new mongoose_1.Schema({
         type: String,
         trim: true,
     },
+    favoritos: [
+        {}
+    ]
 }, {
     timestamps: true,
     versionKey: false,

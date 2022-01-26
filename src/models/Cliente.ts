@@ -42,6 +42,11 @@ const ClienteSchema = new Schema({
         trim: true,
     
     },
+    favoritos: [
+        {
+            
+        }
+    ]
         
 }, {
     timestamps: true,

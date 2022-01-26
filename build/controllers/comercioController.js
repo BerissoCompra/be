@@ -21,10 +21,10 @@ class ComercioController {
             const comercio = new Comercio_1.default(req.body);
             const comercioGuardado = yield comercio.save();
             if (comercioGuardado) {
-                return res.status(200).json({ ok: 'Comercio creado.' });
+                return res.status(200).json({ msg: 'Comercio creado.' });
             }
             else {
-                return res.status(500).json({ err: 'El comercio no se pudo crear correctamente.' });
+                return res.status(500).json({ msg: 'El comercio no se pudo crear correctamente.' });
             }
         });
     }
@@ -37,35 +37,46 @@ class ComercioController {
     obtenerComerciosById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const comercios = yield Comercio_1.default.findById(id);
-            if (comercios) {
-                return res.status(200).json(comercios);
-            }
-            else {
-                return res.status(404).json({ ok: 'No se encontro el comercio' });
-            }
+            const comercios = yield Comercio_1.default.findById(id)
+                .then((comercio) => {
+                return res.status(200).json(comercio);
+            })
+                .catch((err) => {
+                return res.status(404).json({ msg: 'No se encontro el comercio' });
+            });
         });
     }
     obtenerComerciosByFiltro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { body } = req;
-            if (body.filtro === tipo_filtro_enum_1.TipoFiltroEnum.ABIERTOS) {
-                const comercios = yield Comercio_1.default.find({ abierto: true });
-                if (comercios) {
-                    return res.status(200).json(comercios);
-                }
-                else {
-                    return res.status(404).json({ ok: 'No se encontraron el comercio' });
-                }
+            const { filtro } = req.params;
+            console.log(filtro);
+            if (filtro === tipo_filtro_enum_1.TipoFiltroEnum.ABIERTOS) {
+                const comercios = yield Comercio_1.default.find({ abierto: true })
+                    .then((comercio) => {
+                    return res.status(200).json(comercio);
+                })
+                    .catch((error) => {
+                    return res.status(404).json({ msg: 'No se encontraron el comercio' });
+                });
             }
-            else {
-                const comercios = yield Comercio_1.default.find({});
-                if (comercios) {
-                    return res.status(200).json(comercios);
-                }
-                else {
-                    return res.status(404).json({ ok: 'No se encontraron el comercio' });
-                }
+            else if (filtro === tipo_filtro_enum_1.TipoFiltroEnum.DESTACADOS) {
+                const comercios = yield Comercio_1.default.find({ estrellas: { $gt: 3 } })
+                    .then((comercio) => {
+                    return res.status(200).json(comercio);
+                })
+                    .catch((error) => {
+                    return res.status(404).json({ msg: 'No se encontraron el comercio' });
+                });
+            }
+            else if (filtro === 'todos') {
+                const comercios = yield Comercio_1.default.find({})
+                    .then((comercio) => {
+                    return res.status(200).json(comercio);
+                })
+                    .catch((error) => {
+                    return res.status(404).json({ msg: 'No se encontraron el comercio' });
+                });
             }
         });
     }
@@ -77,36 +88,44 @@ class ComercioController {
                 return res.status(200).json(comercios[0]);
             }
             else {
-                return res.status(404).json({ err: 'No se encontro el comercio' });
+                return res.status(404).json({ msg: 'No se encontro el comercio' });
             }
         });
     }
     actualizarComercio(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const comercios = yield Comercio_1.default.updateOne({ _id: id }, req.body);
-            if (comercios) {
-                return res.status(200).json(comercios);
-            }
-            else {
-                return res.status(404).json({ err: 'No se pudo actualizar' });
-            }
+            yield Comercio_1.default.updateOne({ _id: id }, req.body).then((ok) => {
+                return res.status(200).json(ok);
+            })
+                .catch((err) => {
+                return res.status(404).json({ msg: 'No se pudo actualizar' });
+            });
         });
     }
     calificarComercio(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const { calificacion, contadorCalificaciones } = req.body;
-            const comercios = yield Comercio_1.default.updateOne({ _id: id }, {
-                puntuacion: calificacion,
-                contadorCalificaciones: contadorCalificaciones
+            const { calificacion } = req.body;
+            let punt;
+            let cont;
+            let estrellas;
+            yield Comercio_1.default.findOne({ _id: id }).then((comercio) => __awaiter(this, void 0, void 0, function* () {
+                punt = comercio.puntuacion + calificacion;
+                cont = comercio.contadorCalificaciones + 1;
+                estrellas = punt / cont;
+            }));
+            yield Comercio_1.default.updateOne({ _id: id }, {
+                puntuacion: punt,
+                contadorCalificaciones: cont,
+                estrellas,
+            })
+                .then((com) => {
+                return res.status(200).json(com);
+            })
+                .catch((err) => {
+                return res.status(404).json({ msg: 'No se pudo actualizar' });
             });
-            if (comercios) {
-                return res.status(200).json(comercios);
-            }
-            else {
-                return res.status(404).json({ err: 'No se pudo actualizar' });
-            }
         });
     }
     verificarComercio(req, res) {
@@ -123,7 +142,7 @@ class ComercioController {
                 }
             }
             else {
-                return res.status(404).json({ err: 'No se encontro el comercio' });
+                return res.status(404).json({ msg: 'No se encontro el comercio' });
             }
         });
     }

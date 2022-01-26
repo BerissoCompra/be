@@ -56,6 +56,9 @@ const comercioSchema = new mongoose_1.Schema({
     contadorCalificaciones: {
         type: Number
     },
+    estrellas: {
+        type: Number
+    },
     costoEnvio: {
         type: Number
     },

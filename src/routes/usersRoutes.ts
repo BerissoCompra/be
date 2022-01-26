@@ -16,6 +16,8 @@ class UsersRoutes {
         this.router.post('/cliente/signin', usersController.iniciarSesionCliente);
         this.router.post('/cliente/signup', usersController.crearUsuarioCliente);
         this.router.get('/cliente', this.verifyToken, usersController.getClienteById);
+
+        this.router.put('/cliente/:id/fav', this.verifyToken, usersController.addFavorito);
     }
 
 

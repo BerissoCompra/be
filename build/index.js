@@ -50,9 +50,9 @@ app.use('/api/catalogo', productosRoutes_1.default);
 app.use('/api/pedidos', pedidosRoutes_1.default);
 app.use('/api/auth', usersRoutes_1.default);
 io.on('connection', (socket) => {
-    const idHandShake = socket.id;
     const { comercioId } = socket.handshake.query;
     socket.join(comercioId);
+    console.log('Connected ', comercioId);
     socket.on('cliente', (res) => {
         const data = res;
         socket.broadcast.to(comercioId).emit('cliente', data);
