@@ -14,7 +14,8 @@ const mongoose_1 = require("mongoose");
 function connectDb() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const db = yield mongoose_1.connect("mongodb+srv://berissoCompra:159753-Bc@mcdarg.nlxws.mongodb.net/MCDArg?retryWrites=true&w=majority");
+            // const db = await connect("mongodb+srv://berissoCompra:159753-Bc@mcdarg.nlxws.mongodb.net/MCDArg?retryWrites=true&w=majority");
+            const db = yield mongoose_1.connect("mongodb://localhost/bcdb");
             console.log("db connected", db.connection.name);
         }
         catch (error) {
