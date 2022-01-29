@@ -28,6 +28,7 @@ const keys_1 = __importDefault(require("../keys"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Usuario_1 = __importDefault(require("../models/Usuario"));
 const Cliente_1 = __importDefault(require("../models/Cliente"));
+const Comercio_1 = __importDefault(require("../models/Comercio"));
 class UsersController {
     iniciarSesion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -111,18 +112,18 @@ class UsersController {
     addFavorito(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const { comercio } = req.body;
+            const { comercioId } = req.body;
             let nuevosFavoritos = [];
             let respuesta = false;
             yield Cliente_1.default.findOne({ _id: id })
                 .then((client) => {
-                const existe = client.favoritos.filter((fav) => fav._id === comercio._id);
+                const existe = client.favoritos.filter((fav) => fav === comercioId);
                 if (existe.length > 0) {
-                    nuevosFavoritos = client.favoritos.filter((fav) => fav._id != comercio._id);
+                    nuevosFavoritos = client.favoritos.filter((fav) => fav != comercioId);
                     respuesta = false;
                 }
                 else {
-                    nuevosFavoritos = [...client.favoritos, comercio];
+                    nuevosFavoritos = [...client.favoritos, comercioId];
                     respuesta = true;
                 }
             })
@@ -131,11 +132,40 @@ class UsersController {
             });
             yield Cliente_1.default.updateOne({ _id: id }, { favoritos: nuevosFavoritos })
                 .then((re) => {
-                console.log(re);
                 return res.status(200).json({ msg: respuesta });
             })
                 .catch((err) => {
                 return res.status(404).json({ msg: 'No se encontro el cliente' });
+            });
+        });
+    }
+    obtenerFavoritos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            let favoritos = [];
+            yield Cliente_1.default.findOne({ _id: id })
+                .then((cliente) => {
+                const favs = cliente.favoritos;
+                if (favs.length > 0) {
+                    favs.map((comercioId) => __awaiter(this, void 0, void 0, function* () {
+                        yield Comercio_1.default.findOne({ _id: comercioId })
+                            .then((res) => {
+                            favoritos.push(res);
+                        })
+                            .catch((err) => {
+                            return res.status(500).json({ msg: err });
+                        });
+                        if (favoritos.length >= favs.length) {
+                            return res.status(200).json(favoritos);
+                        }
+                    }));
+                }
+                else {
+                    return res.status(200).json([]);
+                }
+            })
+                .catch((err) => {
+                return res.status(500).json({ msg: err });
             });
         });
     }

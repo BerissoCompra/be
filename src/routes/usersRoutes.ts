@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 class UsersRoutes {
     public router: Router = Router();
     constructor(){
-        this.config();
+        this.config(); 
     }
     config():void{
         this.router.post('/signin', usersController.iniciarSesion);
@@ -18,6 +18,7 @@ class UsersRoutes {
         this.router.get('/cliente', this.verifyToken, usersController.getClienteById);
 
         this.router.put('/cliente/:id/fav', this.verifyToken, usersController.addFavorito);
+        this.router.get('/cliente/:id/fav', this.verifyToken, usersController.obtenerFavoritos);
     }
 
 

@@ -19,6 +19,7 @@ class UsersRoutes {
         this.router.post('/cliente/signup', usersController_1.usersController.crearUsuarioCliente);
         this.router.get('/cliente', this.verifyToken, usersController_1.usersController.getClienteById);
         this.router.put('/cliente/:id/fav', this.verifyToken, usersController_1.usersController.addFavorito);
+        this.router.get('/cliente/:id/fav', this.verifyToken, usersController_1.usersController.obtenerFavoritos);
     }
     verifyToken(req, res, next) {
         if (!req.headers.authorization)

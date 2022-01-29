@@ -13,8 +13,6 @@ class ComercioController{
         else{
             return res.status(500).json({msg: 'El comercio no se pudo crear correctamente.'});
         }
-
-        
     }
 
     public async obtenerComercios(req: Request, res: Response){

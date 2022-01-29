@@ -3,6 +3,7 @@ import keys from '../keys';
 import jwt from 'jsonwebtoken';
 import Usuario from '../models/Usuario';
 import Cliente from '../models/Cliente';
+import Comercio from '../models/Comercio';
 class UsersController{
 
     public async iniciarSesion(req: Request, res: Response){
@@ -82,19 +83,19 @@ class UsersController{
 
     public async addFavorito(req: any, res: Response){
         const {id} = req.params;
-        const {comercio} = req.body;
+        const {comercioId} = req.body;
         let nuevosFavoritos: any[] = [];
         let respuesta: boolean = false;
         
         await Cliente.findOne({_id: id})
         .then((client: {favoritos: any[]})=>{
-            const existe = client.favoritos.filter((fav)=> fav._id === comercio._id);
+            const existe = client.favoritos.filter((fav)=> fav === comercioId);
             if(existe.length > 0){
-                nuevosFavoritos = client.favoritos.filter((fav)=> fav._id != comercio._id);
+                nuevosFavoritos = client.favoritos.filter((fav)=> fav != comercioId);
                 respuesta = false;
             }
             else{
-                nuevosFavoritos = [...client.favoritos, comercio]
+                nuevosFavoritos = [...client.favoritos, comercioId]
                 respuesta = true;
             }
         })
@@ -104,7 +105,6 @@ class UsersController{
 
         await Cliente.updateOne({_id: id}, {favoritos: nuevosFavoritos})
         .then((re)=>{
-            console.log(re)
             return res.status(200).json({msg: respuesta});
         })
         .catch((err)=>{
@@ -112,6 +112,39 @@ class UsersController{
         })
 
     }
+
+    public async obtenerFavoritos(req: any, res: Response){
+        const {id} = req.params;
+        let favoritos: any[] = [];
+        await Cliente.findOne({_id: id})
+        .then((cliente: any)=>{ 
+            const favs: any[] = cliente.favoritos;
+            if(favs.length > 0){
+                favs.map(async(comercioId)=>{
+                    await Comercio.findOne({_id: comercioId})
+                    .then((res)=>{
+                        favoritos.push(res);
+                    })
+                    .catch((err)=>{
+                        return res.status(500).json({msg: err})
+                    })
+                    if(favoritos.length >= favs.length){
+                        return res.status(200).json(favoritos);
+                    }
+                })
+            }
+            else{
+                return res.status(200).json([]);
+            }
+        })
+        .catch((err)=>{
+            return res.status(500).json({msg: err})
+        })
+
+       
+
+    }
+
  
 }
 
