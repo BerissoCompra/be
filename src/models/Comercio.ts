@@ -18,6 +18,12 @@ const comercioSchema = new Schema({
         type: String,
         trim: true,
     }, 
+    activado: {
+        default: false,
+        type: String,
+        trim: true,
+        required: true,
+    }, 
     telefono: {
         type: String,
         trim: true,

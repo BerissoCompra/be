@@ -18,9 +18,26 @@ const UsuarioSchema = new mongoose_1.Schema({
         trim: true,
         required: true,
     },
-    tipo: {
+    nombreElegido: {
         type: String,
         trim: true,
+        required: false,
+    },
+    apellido: {
+        type: String,
+        trim: true,
+        required: true,
+    },
+    terminos: {
+        type: Boolean,
+        trim: true,
+        required: true,
+    },
+    emailActivado: {
+        default: false,
+        type: Boolean,
+        trim: true,
+        required: true,
     },
 }, {
     timestamps: true,

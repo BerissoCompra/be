@@ -9,20 +9,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectDb = void 0;
-const mongoose_1 = require("mongoose");
+exports.sendEmail = exports.transporter = void 0;
+const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
 dotenv.config();
-function connectDb() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            //const db = await connect(process.env.DB_CONNECTION_DEV as string);
-            const db = yield mongoose_1.connect(process.env.DB_CONNECTION_LOC);
-            console.log("db connected", db.connection.name);
-        }
-        catch (error) {
-            console.log(error);
-        }
+// create reusable transporter object using the default SMTP transport
+exports.transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.GMAIL_USERNAME,
+        pass: process.env.GMAIL_KEY, // generated ethereal password
+    },
+});
+exports.transporter.verify().then((res) => {
+    console.log("Ready for send emails");
+});
+const sendEmail = (from, to, subject, html) => __awaiter(void 0, void 0, void 0, function* () {
+    yield exports.transporter.sendMail({
+        from: ` ${from} ${process.env.GMAIL_USERNAME}`,
+        to,
+        subject,
+        html, // html body
     });
-}
-exports.connectDb = connectDb;
+});
+exports.sendEmail = sendEmail;

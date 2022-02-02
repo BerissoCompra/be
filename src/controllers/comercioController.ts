@@ -16,7 +16,7 @@ class ComercioController{
     }
 
     public async obtenerComercios(req: Request, res: Response){
-        const comercios = await ComercioModel.find({});
+        const comercios = await ComercioModel.find({activado: true});
         return res.status(200).json(comercios);
     }
 
@@ -39,7 +39,7 @@ class ComercioController{
         console.log(filtro)
 
         if(filtro === TipoFiltroEnum.ABIERTOS){
-            const comercios = await ComercioModel.find({abierto: true})
+            const comercios = await ComercioModel.find({abierto: true, activado: true}).sort(({estrellas: -1}))
             .then((comercio)=>{
                 return res.status(200).json(comercio);
             })
@@ -48,7 +48,7 @@ class ComercioController{
             })
         }
         else if(filtro === TipoFiltroEnum.DESTACADOS){
-            const comercios = await ComercioModel.find({estrellas: {$gt: 3}})
+            const comercios = await ComercioModel.find({estrellas: {$gt: 3}, activado: true}).sort(({estrellas: -1}))
             .then((comercio)=>{
                 return res.status(200).json(comercio);
             })
@@ -57,7 +57,7 @@ class ComercioController{
             })
         }
         else if(filtro === 'todos'){
-            const comercios = await ComercioModel.find({})
+            const comercios = await ComercioModel.find({activado: true}).sort(({estrellas: -1}))
             .then((comercio)=>{
                 return res.status(200).json(comercio);
             })
@@ -98,23 +98,26 @@ class ComercioController{
         let cont;
         let estrellas;
 
+        console.log(calificacion + " "+ id)
+
         await ComercioModel.findOne({_id: id}).then(async(comercio: any)=>{
+            console.log(comercio)
             punt = comercio.puntuacion + calificacion
-            cont = comercio.contadorCalificaciones + 1
+            cont = comercio.contadorCalificaciones ? comercio.contadorCalificaciones + 1 : 1
             estrellas = punt / cont;
-        })
- 
-        await ComercioModel.updateOne({_id: id}, {
-            puntuacion: punt,
-            contadorCalificaciones: cont,
-            estrellas,
-        })
-        .then((com)=>{
-            return res.status(200).json(com);
-        })
-        .catch((err)=>{
-            return res.status(404).json({msg: 'No se pudo actualizar'});
-        })
+            await ComercioModel.updateOne({_id: id}, {
+                puntuacion: punt,
+                contadorCalificaciones: cont,
+                estrellas,
+            })
+            .then((com)=>{
+                return res.status(200).json(com);
+            })
+            .catch((err)=>{
+                return res.status(404).json({msg: 'No se pudo actualizar'});
+            })
+
+        })  
          
     }
 

@@ -29,18 +29,22 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Usuario_1 = __importDefault(require("../models/Usuario"));
 const Cliente_1 = __importDefault(require("../models/Cliente"));
 const Comercio_1 = __importDefault(require("../models/Comercio"));
+const CodigosRecuperacion_1 = __importDefault(require("../models/CodigosRecuperacion"));
+const mailer_1 = require("../config/mailer");
 class UsersController {
     iniciarSesion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = req.body;
             const usuarioExiste = yield Usuario_1.default.find({ email: email, password: password });
             if (usuarioExiste.length > 0) {
+                const activado = yield usuarioExiste[0].emailActivado;
                 const data = JSON.stringify({ uid: usuarioExiste[0]._id });
                 const token = jsonwebtoken_1.default.sign(data, keys_1.default.seckey);
-                return res.status(200).json({ token: token });
+                console.log(activado);
+                return yield res.status(200).json({ token: token, activado });
             }
             else {
-                return res.status(500).json({ error: 'El usuario y/o contraseña son incorrectos' });
+                return yield res.status(500).json({ error: 'El usuario y/o contraseña son incorrectos' });
             }
         });
     }
@@ -55,6 +59,9 @@ class UsersController {
                 const nuevoUsuario = new Usuario_1.default(req.body);
                 const usuarioRegistrado = yield nuevoUsuario.save();
                 if (usuarioRegistrado) {
+                    const urlActivacion = `http://localhost:3000/api/auth/${usuarioRegistrado._id}/accountverify`;
+                    const html = `<h2>Aplicación ciudad | Haz click para activar:</h2><a href="${urlActivacion}">AQUI</a>`;
+                    yield mailer_1.sendEmail('Activar Cuenta | Responsable de Comercio', email, 'Servicio de activación', html);
                     return res.status(200).json({ _id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre });
                 }
                 else {
@@ -64,25 +71,57 @@ class UsersController {
         });
     }
     iniciarSesionCliente(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = req.body;
             const usuarioExiste = yield Cliente_1.default.find({ email: email, password: password });
             if (usuarioExiste.length > 0) {
                 const data = JSON.stringify({ uid: usuarioExiste[0]._id });
                 const token = jsonwebtoken_1.default.sign(data, keys_1.default.seckey);
-                return res.status(200).json({ token });
+                if (!((_a = usuarioExiste[0]) === null || _a === void 0 ? void 0 : _a.emailActivado)) {
+                    return res.status(200).json({ token });
+                }
+                else {
+                    return res.status(200).json({ token });
+                }
             }
             else {
-                return res.status(500).json({ error: 'El usuario y/o contraseña son incorrectos' });
+                return res.status(404).json({ error: 'El usuario y/o contraseña son incorrectos' });
+            }
+        });
+    }
+    VerificarCuenta(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const usuarioExiste = yield Usuario_1.default.findOne({ _id: id });
+            if (usuarioExiste) {
+                if (usuarioExiste.emailActivado === true) {
+                    return res.status(404).json({ msg: 'El usuario ya está activado' });
+                }
+                else {
+                    yield Usuario_1.default.updateOne({ _id: id }, { emailActivado: true })
+                        .then(() => {
+                        return res.status(200).json({ msg: 'Usuario Activado' });
+                    })
+                        .catch((msg) => {
+                        return res.status(404).json({ msg });
+                    });
+                }
+            }
+            else {
+                return res.status(404).json({ msg: 'No existe el usuario' });
             }
         });
     }
     crearUsuarioCliente(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email } = req.body;
+            const { email, terminos } = req.body;
             const usuarioExiste = yield Cliente_1.default.find({ email: email.toLowerCase() });
             if (usuarioExiste.length > 0) {
                 return res.status(200).json({ err: 'El email ingresado ya se encuentra registrado.' });
+            }
+            else if (!terminos) {
+                return res.status(200).json({ err: 'Debe aceptar los Términos y Condiciones.' });
             }
             else {
                 const nuevoUsuario = new Cliente_1.default(req.body);
@@ -115,58 +154,58 @@ class UsersController {
             const { comercioId } = req.body;
             let nuevosFavoritos = [];
             let respuesta = false;
-            yield Cliente_1.default.findOne({ _id: id })
-                .then((client) => {
-                const existe = client.favoritos.filter((fav) => fav === comercioId);
+            const cliente = yield Cliente_1.default.findOne({ _id: id });
+            if (cliente) {
+                const existe = cliente.favoritos.filter((fav) => fav === comercioId);
                 if (existe.length > 0) {
-                    nuevosFavoritos = client.favoritos.filter((fav) => fav != comercioId);
+                    nuevosFavoritos = cliente.favoritos.filter((fav) => fav != comercioId);
                     respuesta = false;
                 }
                 else {
-                    nuevosFavoritos = [...client.favoritos, comercioId];
+                    nuevosFavoritos = [...cliente.favoritos, comercioId];
                     respuesta = true;
                 }
-            })
-                .catch((err) => {
-                return res.status(404).json({ msg: 'No se encontro el cliente' });
-            });
-            yield Cliente_1.default.updateOne({ _id: id }, { favoritos: nuevosFavoritos })
-                .then((re) => {
+                yield Cliente_1.default.updateOne({ _id: id }, { favoritos: nuevosFavoritos });
                 return res.status(200).json({ msg: respuesta });
-            })
-                .catch((err) => {
+            }
+            else {
                 return res.status(404).json({ msg: 'No se encontro el cliente' });
-            });
+            }
         });
     }
     obtenerFavoritos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            let favoritos = [];
-            yield Cliente_1.default.findOne({ _id: id })
-                .then((cliente) => {
-                const favs = cliente.favoritos;
-                if (favs.length > 0) {
-                    favs.map((comercioId) => __awaiter(this, void 0, void 0, function* () {
-                        yield Comercio_1.default.findOne({ _id: comercioId })
-                            .then((res) => {
-                            favoritos.push(res);
-                        })
-                            .catch((err) => {
-                            return res.status(500).json({ msg: err });
-                        });
-                        if (favoritos.length >= favs.length) {
-                            return res.status(200).json(favoritos);
-                        }
-                    }));
-                }
-                else {
-                    return res.status(200).json([]);
-                }
-            })
-                .catch((err) => {
-                return res.status(500).json({ msg: err });
-            });
+            const cliente = yield Cliente_1.default.findOne({ _id: id });
+            if (cliente) {
+                const comerciosFavoritos = yield Promise.all(cliente.favoritos.map((comercioId) => __awaiter(this, void 0, void 0, function* () {
+                    return yield Comercio_1.default.findOne({ _id: comercioId });
+                })));
+                return res.status(200).json(comerciosFavoritos);
+            }
+            else {
+                return res.status(404).json({ msg: 'Id inexistente' });
+            }
+        });
+    }
+    EnviarCodigoVerificacion(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email } = req.body;
+            const cliente = yield Usuario_1.default.findOne({ email });
+            if (cliente) {
+                const codigoRecuperacion = {
+                    email,
+                    codigo: `AC-${Math.round(Math.random() * 10000)}`
+                };
+                const html = `<h2>Aplicación ciudad | CODIGO:</h2><p>${codigoRecuperacion.codigo}</p>`;
+                const crearCodigo = new CodigosRecuperacion_1.default(codigoRecuperacion);
+                yield crearCodigo.save();
+                yield mailer_1.sendEmail('Recuperación de contraseña', email, 'Servicio de recuperación', html);
+                return res.status(200).send({ msg: true });
+            }
+            else {
+                return res.status(404).json({ msg: 'El usuario no existe' });
+            }
         });
     }
 }

@@ -13,10 +13,16 @@ const ClienteSchema = new mongoose_1.Schema({
         trim: true,
         required: true,
     },
+    //-----------------------------------------------------------/
     nombre: {
         type: String,
         trim: true,
         required: true,
+    },
+    nombreElegido: {
+        type: String,
+        trim: true,
+        required: false,
     },
     direccion: {
         type: String,
@@ -31,20 +37,19 @@ const ClienteSchema = new mongoose_1.Schema({
     direccionInfo: {
         type: String,
         trim: true,
-        required: true,
+        required: false,
     },
     telefono: {
         type: String,
         trim: true,
         required: true,
     },
-    tipo: {
+    genero: {
         type: String,
         trim: true,
+        required: false,
     },
-    favoritos: [
-        {}
-    ]
+    favoritos: []
 }, {
     timestamps: true,
     versionKey: false,

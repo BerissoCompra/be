@@ -19,6 +19,12 @@ const comercioSchema = new mongoose_1.Schema({
         type: String,
         trim: true,
     },
+    activado: {
+        default: false,
+        type: String,
+        trim: true,
+        required: true,
+    },
     telefono: {
         type: String,
         trim: true,

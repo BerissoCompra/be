@@ -30,7 +30,7 @@ class ComercioController {
     }
     obtenerComercios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comercios = yield Comercio_1.default.find({});
+            const comercios = yield Comercio_1.default.find({ activado: true });
             return res.status(200).json(comercios);
         });
     }
@@ -52,7 +52,7 @@ class ComercioController {
             const { filtro } = req.params;
             console.log(filtro);
             if (filtro === tipo_filtro_enum_1.TipoFiltroEnum.ABIERTOS) {
-                const comercios = yield Comercio_1.default.find({ abierto: true })
+                const comercios = yield Comercio_1.default.find({ abierto: true, activado: true }).sort(({ estrellas: -1 }))
                     .then((comercio) => {
                     return res.status(200).json(comercio);
                 })
@@ -61,7 +61,7 @@ class ComercioController {
                 });
             }
             else if (filtro === tipo_filtro_enum_1.TipoFiltroEnum.DESTACADOS) {
-                const comercios = yield Comercio_1.default.find({ estrellas: { $gt: 3 } })
+                const comercios = yield Comercio_1.default.find({ estrellas: { $gt: 3 }, activado: true }).sort(({ estrellas: -1 }))
                     .then((comercio) => {
                     return res.status(200).json(comercio);
                 })
@@ -70,7 +70,7 @@ class ComercioController {
                 });
             }
             else if (filtro === 'todos') {
-                const comercios = yield Comercio_1.default.find({})
+                const comercios = yield Comercio_1.default.find({ activado: true }).sort(({ estrellas: -1 }))
                     .then((comercio) => {
                     return res.status(200).json(comercio);
                 })
@@ -110,22 +110,24 @@ class ComercioController {
             let punt;
             let cont;
             let estrellas;
+            console.log(calificacion + " " + id);
             yield Comercio_1.default.findOne({ _id: id }).then((comercio) => __awaiter(this, void 0, void 0, function* () {
+                console.log(comercio);
                 punt = comercio.puntuacion + calificacion;
-                cont = comercio.contadorCalificaciones + 1;
+                cont = comercio.contadorCalificaciones ? comercio.contadorCalificaciones + 1 : 1;
                 estrellas = punt / cont;
+                yield Comercio_1.default.updateOne({ _id: id }, {
+                    puntuacion: punt,
+                    contadorCalificaciones: cont,
+                    estrellas,
+                })
+                    .then((com) => {
+                    return res.status(200).json(com);
+                })
+                    .catch((err) => {
+                    return res.status(404).json({ msg: 'No se pudo actualizar' });
+                });
             }));
-            yield Comercio_1.default.updateOne({ _id: id }, {
-                puntuacion: punt,
-                contadorCalificaciones: cont,
-                estrellas,
-            })
-                .then((com) => {
-                return res.status(200).json(com);
-            })
-                .catch((err) => {
-                return res.status(404).json({ msg: 'No se pudo actualizar' });
-            });
         });
     }
     verificarComercio(req, res) {
