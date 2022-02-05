@@ -20,6 +20,7 @@ class ComerciosRoutes {
         this.router.post('/filtrar/:filtro', this.verifyToken, comercioController_1.comercioController.obtenerComerciosByFiltro);
         this.router.get('/:id', this.verifyToken, comercioController_1.comercioController.obtenerComerciosById);
         this.router.put('/:id', this.verifyToken, comercioController_1.comercioController.actualizarComercio);
+        this.router.put('/:id/activar', this.verifyToken, comercioController_1.comercioController.activarComercio);
         this.router.put('/calificar/:id', comercioController_1.comercioController.calificarComercio);
         this.router.get('/verificar/:id', this.verifyToken, comercioController_1.comercioController.verificarComercio);
     }

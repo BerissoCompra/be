@@ -16,7 +16,7 @@ class ComercioController{
     }
 
     public async obtenerComercios(req: Request, res: Response){
-        const comercios = await ComercioModel.find({activado: true});
+        const comercios = await ComercioModel.find({activado: false});
         return res.status(200).json(comercios);
     }
 
@@ -83,6 +83,16 @@ class ComercioController{
     public async actualizarComercio(req: any, res: Response){
         const {id} = req.params;
         await ComercioModel.updateOne({_id: id}, req.body).then((ok)=>{
+            return res.status(200).json(ok);
+        })
+        .catch((err)=>{
+            return res.status(404).json({msg: 'No se pudo actualizar'});
+        })      
+    }
+
+    public async activarComercio(req: any, res: Response){
+        const {id} = req.params;
+        await ComercioModel.updateOne({_id: id}, {activado: true}).then((ok)=>{
             return res.status(200).json(ok);
         })
         .catch((err)=>{
