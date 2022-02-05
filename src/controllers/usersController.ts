@@ -29,7 +29,7 @@ class UsersController{
         const usuarioExiste = await Usuario.find({email: email.toLowerCase()})
 
         if(usuarioExiste.length > 0){
-            return res.status(200).json({err: 'El email ingresado ya se encuentra registrado.'});
+            return res.status(200).json({msg: 'El email ingresado ya se encuentra registrado.'});
         }
         else{
             const nuevoUsuario = new Usuario(req.body);
@@ -41,7 +41,7 @@ class UsersController{
                 return res.status(200).json({_id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre});
             }
             else{
-                return res.status(404).json({err: 'No se pudo registrar.'});
+                return res.status(404).json({msg: 'No se pudo registrar.'});
             }
         }
     }
@@ -70,7 +70,7 @@ class UsersController{
 
         if(usuarioExiste){
             if(usuarioExiste.emailActivado === true){
-                return res.status(404).json({msg: 'El usuario ya está activado'})
+                return res.status(404).json({msg: 'Este usuario ya se encuentra activado.'})
             }
             else{
                 await Usuario.updateOne({_id: id}, {emailActivado: true})
@@ -93,10 +93,10 @@ class UsersController{
         const {email, terminos} = req.body;
         const usuarioExiste = await Cliente.find({email: email.toLowerCase()})
         if(usuarioExiste.length > 0){
-            return res.status(200).json({err: 'El email ingresado ya se encuentra registrado.'});
+            return res.status(200).json({msg: 'El email ingresado ya se encuentra registrado.'});
         }
         else if(!terminos){
-            return res.status(200).json({err: 'Debe aceptar los Términos y Condiciones.'});
+            return res.status(200).json({msg: 'Debe aceptar los Términos y Condiciones.'});
         }
         else{
             const nuevoUsuario = new Cliente(req.body);
@@ -105,7 +105,7 @@ class UsersController{
                 return res.status(200).json({_id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre});
             }
             else{
-                return res.status(404).json({err: 'No se pudo registrar.'});
+                return res.status(404).json({msg: 'No se pudo registrar.'});
             }
         }
     }
@@ -190,9 +190,31 @@ class UsersController{
         }
     }
 
-    // public async RecuperarPassword(req: Request, res: Response): Promise<Response<any>>{
+    
+    public async verificarCodigo(req: Request, res: Response){
+        const {email, codigo} = req.body;
+        const buscarCodigo = await CodigosRecuperacion.findOne({codigo, email}).catch((err)=> res.status(500).json({msg: err})) 
 
-    // }
+        if(buscarCodigo){
+            return res.status(200).json({msg: email});
+        }
+        else{
+            return res.status(404).json({msg: 'No se pudo registrar.'});
+        }
+    }
+
+    public async RecuperarPassword(req: Request, res: Response): Promise<Response<any>>{
+        const {email, password} = req.body;
+        const usuario = await Usuario.findOne({email});
+
+        if(usuario){
+            await Usuario.updateOne({_id: usuario._id}, {password});
+            return res.status(200).json({msg: 'Contraseña actualizada.'});
+        }
+        else{
+            return res.status(404).json({msg: 'Error.'});
+        }
+    }
 
  
 }

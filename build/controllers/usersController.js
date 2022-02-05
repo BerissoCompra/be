@@ -53,7 +53,7 @@ class UsersController {
             const { email } = req.body;
             const usuarioExiste = yield Usuario_1.default.find({ email: email.toLowerCase() });
             if (usuarioExiste.length > 0) {
-                return res.status(200).json({ err: 'El email ingresado ya se encuentra registrado.' });
+                return res.status(200).json({ msg: 'El email ingresado ya se encuentra registrado.' });
             }
             else {
                 const nuevoUsuario = new Usuario_1.default(req.body);
@@ -65,7 +65,7 @@ class UsersController {
                     return res.status(200).json({ _id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre });
                 }
                 else {
-                    return res.status(404).json({ err: 'No se pudo registrar.' });
+                    return res.status(404).json({ msg: 'No se pudo registrar.' });
                 }
             }
         });
@@ -96,7 +96,7 @@ class UsersController {
             const usuarioExiste = yield Usuario_1.default.findOne({ _id: id });
             if (usuarioExiste) {
                 if (usuarioExiste.emailActivado === true) {
-                    return res.status(404).json({ msg: 'El usuario ya está activado' });
+                    return res.status(404).json({ msg: 'Este usuario ya se encuentra activado.' });
                 }
                 else {
                     yield Usuario_1.default.updateOne({ _id: id }, { emailActivado: true })
@@ -118,10 +118,10 @@ class UsersController {
             const { email, terminos } = req.body;
             const usuarioExiste = yield Cliente_1.default.find({ email: email.toLowerCase() });
             if (usuarioExiste.length > 0) {
-                return res.status(200).json({ err: 'El email ingresado ya se encuentra registrado.' });
+                return res.status(200).json({ msg: 'El email ingresado ya se encuentra registrado.' });
             }
             else if (!terminos) {
-                return res.status(200).json({ err: 'Debe aceptar los Términos y Condiciones.' });
+                return res.status(200).json({ msg: 'Debe aceptar los Términos y Condiciones.' });
             }
             else {
                 const nuevoUsuario = new Cliente_1.default(req.body);
@@ -130,7 +130,7 @@ class UsersController {
                     return res.status(200).json({ _id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre });
                 }
                 else {
-                    return res.status(404).json({ err: 'No se pudo registrar.' });
+                    return res.status(404).json({ msg: 'No se pudo registrar.' });
                 }
             }
         });
@@ -205,6 +205,31 @@ class UsersController {
             }
             else {
                 return res.status(404).json({ msg: 'El usuario no existe' });
+            }
+        });
+    }
+    verificarCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, codigo } = req.body;
+            const buscarCodigo = yield CodigosRecuperacion_1.default.findOne({ codigo, email }).catch((err) => res.status(500).json({ msg: err }));
+            if (buscarCodigo) {
+                return res.status(200).json({ msg: email });
+            }
+            else {
+                return res.status(404).json({ msg: 'No se pudo registrar.' });
+            }
+        });
+    }
+    RecuperarPassword(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, password } = req.body;
+            const usuario = yield Usuario_1.default.findOne({ email });
+            if (usuario) {
+                yield Usuario_1.default.updateOne({ _id: usuario._id }, { password });
+                return res.status(200).json({ msg: 'Contraseña actualizada.' });
+            }
+            else {
+                return res.status(404).json({ msg: 'Error.' });
             }
         });
     }

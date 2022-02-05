@@ -14,6 +14,8 @@ class UsersRoutes {
         this.router.post('/signup', usersController.crearUsuario);
         this.router.post('/codigoverificacion', usersController.EnviarCodigoVerificacion);
         this.router.put('/:id/accountverify', usersController.VerificarCuenta);
+        this.router.put('/verificarCodigo', usersController.verificarCodigo);
+        this.router.put('/actualizarpassword', usersController.RecuperarPassword);
 
         this.router.post('/cliente/signin', usersController.iniciarSesionCliente);
         this.router.post('/cliente/signup', usersController.crearUsuarioCliente);
