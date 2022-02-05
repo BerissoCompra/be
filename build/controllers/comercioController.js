@@ -30,7 +30,7 @@ class ComercioController {
     }
     obtenerComercios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comercios = yield Comercio_1.default.find({ activado: false });
+            const comercios = yield Comercio_1.default.find({});
             return res.status(200).json(comercios);
         });
     }
@@ -107,6 +107,17 @@ class ComercioController {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             yield Comercio_1.default.updateOne({ _id: id }, { activado: true }).then((ok) => {
+                return res.status(200).json(ok);
+            })
+                .catch((err) => {
+                return res.status(404).json({ msg: 'No se pudo actualizar' });
+            });
+        });
+    }
+    desactivarComercio(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            yield Comercio_1.default.updateOne({ _id: id }, { activado: false }).then((ok) => {
                 return res.status(200).json(ok);
             })
                 .catch((err) => {
