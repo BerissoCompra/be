@@ -228,6 +228,7 @@ class UsersController {
                 const usuario = yield Usuario_1.default.findOne({ email: codigoRecuperacion.email });
                 if (usuario) {
                     yield Usuario_1.default.updateOne({ _id: usuario._id }, { password });
+                    yield CodigosRecuperacion_1.default.deleteOne({ codigo, email: codigoRecuperacion.email });
                     return res.status(200).json({ msg: 'Contraseña actualizada.' });
                 }
                 else {

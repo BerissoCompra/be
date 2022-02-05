@@ -211,6 +211,7 @@ class UsersController{
             const usuario = await Usuario.findOne({email: codigoRecuperacion.email});
             if(usuario){
                 await Usuario.updateOne({_id: usuario._id}, {password});
+                await CodigosRecuperacion.deleteOne({codigo, email: codigoRecuperacion.email})
                 return res.status(200).json({msg: 'Contraseña actualizada.'});
             }
             else{
