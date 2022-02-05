@@ -16,7 +16,7 @@ class ComerciosRoutes {
         this.router.get('/:id', this.verifyToken,comercioController.obtenerComerciosById);
         this.router.put('/:id', this.verifyToken ,comercioController.actualizarComercio);
         this.router.put('/:id/activar', this.verifyToken ,comercioController.activarComercio);
-        this.router.put('/:id/desactivar', this.verifyToken ,comercioController.activarComercio);
+        this.router.put('/:id/desactivar', this.verifyToken ,comercioController.desactivarComercio);
         this.router.put('/calificar/:id',comercioController.calificarComercio);
         this.router.get('/verificar/:id', this.verifyToken ,comercioController.verificarComercio);
     }
