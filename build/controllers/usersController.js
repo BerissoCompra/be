@@ -59,7 +59,7 @@ class UsersController {
                 const nuevoUsuario = new Usuario_1.default(req.body);
                 const usuarioRegistrado = yield nuevoUsuario.save();
                 if (usuarioRegistrado) {
-                    const urlActivacion = `http://localhost:3000/api/auth/${usuarioRegistrado._id}/accountverify`;
+                    const urlActivacion = `http://localhost:4200/accountverify/${usuarioRegistrado._id}`;
                     const html = `<h2>Aplicación ciudad | Haz click para activar:</h2><a href="${urlActivacion}">AQUI</a>`;
                     yield mailer_1.sendEmail('Activar Cuenta | Responsable de Comercio', email, 'Servicio de activación', html);
                     return res.status(200).json({ _id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre });
