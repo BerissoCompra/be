@@ -13,7 +13,7 @@ class UsersRoutes {
         this.router.post('/signin', usersController.iniciarSesion);
         this.router.post('/signup', usersController.crearUsuario);
         this.router.post('/codigoverificacion', usersController.EnviarCodigoVerificacion);
-        this.router.get('/:id/accountverify', usersController.VerificarCuenta);
+        this.router.put('/:id/accountverify', usersController.VerificarCuenta);
 
         this.router.post('/cliente/signin', usersController.iniciarSesionCliente);
         this.router.post('/cliente/signup', usersController.crearUsuarioCliente);
