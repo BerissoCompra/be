@@ -21,7 +21,7 @@ const comercioSchema = new mongoose_1.Schema({
     },
     activado: {
         default: false,
-        type: String,
+        type: Boolean,
         trim: true,
         required: true,
     },

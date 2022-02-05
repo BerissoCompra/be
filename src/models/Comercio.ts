@@ -20,7 +20,7 @@ const comercioSchema = new Schema({
     }, 
     activado: {
         default: false,
-        type: String,
+        type: Boolean,
         trim: true,
         required: true,
     }, 
