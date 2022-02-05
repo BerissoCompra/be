@@ -222,11 +222,17 @@ class UsersController {
     }
     RecuperarPassword(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, password } = req.body;
-            const usuario = yield Usuario_1.default.findOne({ email });
-            if (usuario) {
-                yield Usuario_1.default.updateOne({ _id: usuario._id }, { password });
-                return res.status(200).json({ msg: 'Contraseña actualizada.' });
+            const { codigo, password } = req.body;
+            const codigoRecuperacion = yield CodigosRecuperacion_1.default.findOne({ codigo });
+            if (codigoRecuperacion) {
+                const usuario = yield Usuario_1.default.findOne({ email: codigoRecuperacion.email });
+                if (usuario) {
+                    yield Usuario_1.default.updateOne({ _id: usuario._id }, { password });
+                    return res.status(200).json({ msg: 'Contraseña actualizada.' });
+                }
+                else {
+                    return res.status(404).json({ msg: 'Error.' });
+                }
             }
             else {
                 return res.status(404).json({ msg: 'Error.' });

@@ -204,12 +204,18 @@ class UsersController{
     }
 
     public async RecuperarPassword(req: Request, res: Response): Promise<Response<any>>{
-        const {email, password} = req.body;
-        const usuario = await Usuario.findOne({email});
+        const {codigo, password} = req.body;
+        const codigoRecuperacion = await CodigosRecuperacion.findOne({codigo});
 
-        if(usuario){
-            await Usuario.updateOne({_id: usuario._id}, {password});
-            return res.status(200).json({msg: 'Contraseña actualizada.'});
+        if(codigoRecuperacion){
+            const usuario = await Usuario.findOne({email: codigoRecuperacion.email});
+            if(usuario){
+                await Usuario.updateOne({_id: usuario._id}, {password});
+                return res.status(200).json({msg: 'Contraseña actualizada.'});
+            }
+            else{
+                return res.status(404).json({msg: 'Error.'});
+            }
         }
         else{
             return res.status(404).json({msg: 'Error.'});
