@@ -114,14 +114,17 @@ class UsersController {
             const { email, terminos } = req.body;
             const usuarioExiste = yield Cliente_1.default.find({ email: email.toLowerCase() });
             if (usuarioExiste.length > 0) {
-                return res.status(200).json({ msg: 'El email ingresado ya se encuentra registrado.' });
+                return res.status(404).json({ msg: 'El email ingresado ya se encuentra registrado.' });
+                console.log('El email ingresado ya se encuentra registrado.');
             }
             else if (!terminos) {
-                return res.status(200).json({ msg: 'Debe aceptar los Términos y Condiciones.' });
+                console.log('Debe aceptar los Términos y Condiciones.');
+                return res.status(404).json({ msg: 'Debe aceptar los Términos y Condiciones.' });
             }
             else {
                 const nuevoUsuario = new Cliente_1.default(req.body);
                 const usuarioRegistrado = yield nuevoUsuario.save();
+                console.log(nuevoUsuario);
                 if (usuarioRegistrado) {
                     return res.status(200).json({ _id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre });
                 }
