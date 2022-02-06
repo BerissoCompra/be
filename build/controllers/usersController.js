@@ -71,19 +71,13 @@ class UsersController {
         });
     }
     iniciarSesionCliente(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = req.body;
             const usuarioExiste = yield Cliente_1.default.find({ email: email, password: password });
             if (usuarioExiste.length > 0) {
                 const data = JSON.stringify({ uid: usuarioExiste[0]._id });
                 const token = jsonwebtoken_1.default.sign(data, keys_1.default.seckey);
-                if (!((_a = usuarioExiste[0]) === null || _a === void 0 ? void 0 : _a.emailActivado)) {
-                    return res.status(200).json({ token });
-                }
-                else {
-                    return res.status(200).json({ token });
-                }
+                return res.status(200).json({ token });
             }
             else {
                 return res.status(404).json({ error: 'El usuario y/o contraseña son incorrectos' });

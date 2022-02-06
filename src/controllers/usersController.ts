@@ -52,12 +52,7 @@ class UsersController{
         if(usuarioExiste.length > 0){
             const data = JSON.stringify({uid: usuarioExiste[0]._id});
             const token = jwt.sign(data, keys.seckey)
-            if(!usuarioExiste[0]?.emailActivado){
-                return res.status(200).json({token});
-            }
-            else{
-                return res.status(200).json({token});
-            }
+            return res.status(200).json({token});
         }
         else{
             return res.status(404).json({error: 'El usuario y/o contraseña son incorrectos'})
