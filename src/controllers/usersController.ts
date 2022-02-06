@@ -49,6 +49,7 @@ class UsersController{
     public async iniciarSesionCliente(req: Request, res: Response){
         const {email, password} = req.body;
         const usuarioExiste = await Cliente.find({email: email, password: password})
+        console.log(email, password)
         if(usuarioExiste.length > 0){
             const data = JSON.stringify({uid: usuarioExiste[0]._id});
             const token = jwt.sign(data, keys.seckey)

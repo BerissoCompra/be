@@ -74,6 +74,7 @@ class UsersController {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = req.body;
             const usuarioExiste = yield Cliente_1.default.find({ email: email, password: password });
+            console.log(email, password);
             if (usuarioExiste.length > 0) {
                 const data = JSON.stringify({ uid: usuarioExiste[0]._id });
                 const token = jsonwebtoken_1.default.sign(data, keys_1.default.seckey);
