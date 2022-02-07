@@ -143,11 +143,14 @@ class ComercioController{
 
     public async registrarVenta(req: any, res: Response){
         const {id} = req.params;
+        const {total} = req.body;
         const comercio = await ComercioModel.findOne({_id: id});
         if(comercio){
             const ventas = comercio.estadisticas.ventas ? comercio.estadisticas.ventas : 0;
+            const ingresoTotal = comercio.estadisticas.ingresosTotales ? comercio.estadisticas.ingresosTotales : 0;
             const actualizarVentas = await ComercioModel.updateOne({_id: id}, {estadisticas: {
                 ventas: ventas + 1, 
+                ingresosTotales: ingresoTotal + total
             }})
 
             return res.status(200).json({msg: 'Ha completado un pedido'});

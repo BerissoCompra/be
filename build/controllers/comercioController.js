@@ -155,11 +155,14 @@ class ComercioController {
     registrarVenta(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
+            const { total } = req.body;
             const comercio = yield Comercio_1.default.findOne({ _id: id });
             if (comercio) {
                 const ventas = comercio.estadisticas.ventas ? comercio.estadisticas.ventas : 0;
+                const ingresoTotal = comercio.estadisticas.ingresosTotales ? comercio.estadisticas.ingresosTotales : 0;
                 const actualizarVentas = yield Comercio_1.default.updateOne({ _id: id }, { estadisticas: {
                         ventas: ventas + 1,
+                        ingresosTotales: ingresoTotal + total
                     } });
                 return res.status(200).json({ msg: 'Ha completado un pedido' });
             }
