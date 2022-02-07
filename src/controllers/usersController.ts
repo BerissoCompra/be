@@ -90,8 +90,8 @@ class UsersController{
         const {email, terminos} = req.body;
         const usuarioExiste = await Cliente.find({email: email.toLowerCase()})
         if(usuarioExiste.length > 0){
-            return res.status(404).json({msg: 'El email ingresado ya se encuentra registrado.'});
             console.log('El email ingresado ya se encuentra registrado.')
+            return res.status(404).json({msg: 'El email ingresado ya se encuentra registrado.'});
         }
         else if(!terminos){
             console.log('Debe aceptar los Términos y Condiciones.')

@@ -152,6 +152,22 @@ class ComercioController {
             }));
         });
     }
+    registrarVenta(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const comercio = yield Comercio_1.default.findOne({ _id: id });
+            if (comercio) {
+                const ventas = comercio.estadisticas.ventas ? comercio.estadisticas.ventas : 0;
+                const actualizarVentas = yield Comercio_1.default.updateOne({ _id: id }, { estadisticas: {
+                        ventas: ventas + 1,
+                    } });
+                return res.status(200).json({ msg: 'Ha completado un pedido' });
+            }
+            else {
+                return res.status(404).json({ msg: 'No se encontro el comercio' });
+            }
+        });
+    }
     verificarComercio(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;

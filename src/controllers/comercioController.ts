@@ -141,6 +141,22 @@ class ComercioController{
          
     }
 
+    public async registrarVenta(req: any, res: Response){
+        const {id} = req.params;
+        const comercio = await ComercioModel.findOne({_id: id});
+        if(comercio){
+            const ventas = comercio.estadisticas.ventas ? comercio.estadisticas.ventas : 0;
+            const actualizarVentas = await ComercioModel.updateOne({_id: id}, {estadisticas: {
+                ventas: ventas + 1, 
+            }})
+
+            return res.status(200).json({msg: 'Ha completado un pedido'});
+        }
+        else{
+            return res.status(404).json({msg: 'No se encontro el comercio'});
+        }
+    }
+
     public async verificarComercio(req: any, res: Response){
         const {id} = req.params;
         console.log(id)
