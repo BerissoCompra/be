@@ -160,9 +160,11 @@ class ComercioController {
             if (comercio) {
                 const ventas = comercio.estadisticas.ventas ? comercio.estadisticas.ventas : 0;
                 const ingresoTotal = comercio.estadisticas.ingresosTotales ? comercio.estadisticas.ingresosTotales : 0;
+                const deuda = comercio.estadisticas.deuda ? comercio.estadisticas.deuda : 0;
                 const actualizarVentas = yield Comercio_1.default.updateOne({ _id: id }, { estadisticas: {
                         ventas: ventas + 1,
-                        ingresosTotales: ingresoTotal + total
+                        ingresosTotales: ingresoTotal + total,
+                        deuda: (deuda + total) * 0.5,
                     } });
                 return res.status(200).json({ msg: 'Ha completado un pedido' });
             }

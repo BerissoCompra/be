@@ -102,6 +102,10 @@ const comercioSchema = new Schema({
             type: Number,
             trim: true,
         },
+        deuda:{
+            type: Number,
+            trim: true,
+        },
         ingresosTotales: {
             type: Number,
             trim: true,

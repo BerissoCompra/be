@@ -103,6 +103,10 @@ const comercioSchema = new mongoose_1.Schema({
             type: Number,
             trim: true,
         },
+        deuda: {
+            type: Number,
+            trim: true,
+        },
         ingresosTotales: {
             type: Number,
             trim: true,
