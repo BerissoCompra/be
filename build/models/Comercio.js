@@ -40,6 +40,10 @@ const comercioSchema = new mongoose_1.Schema({
         type: String,
         trim: true,
     },
+    imagenPath: {
+        type: String,
+        trim: true,
+    },
     pagoDigital: {
         type: Boolean,
         default: false,
@@ -109,6 +113,14 @@ const comercioSchema = new mongoose_1.Schema({
         },
         ingresosTotales: {
             type: Number,
+            trim: true,
+        },
+        ultimoPago: {
+            type: Date,
+            trim: true,
+        },
+        proximoPago: {
+            type: Date,
             trim: true,
         },
     }

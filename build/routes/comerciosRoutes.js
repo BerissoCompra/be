@@ -17,11 +17,13 @@ class ComerciosRoutes {
         this.router.get('/', comercioController_1.comercioController.obtenerComercios);
         this.router.post('/new', comercioController_1.comercioController.crearComercio);
         this.router.get('/obtener', this.verifyToken, comercioController_1.comercioController.obtenerComerciosByUserId);
-        this.router.post('/filtrar/:filtro', this.verifyToken, comercioController_1.comercioController.obtenerComerciosByFiltro);
+        this.router.get('/filtrar/:filtro', this.verifyToken, comercioController_1.comercioController.obtenerComerciosByFiltro);
         this.router.get('/:id', this.verifyToken, comercioController_1.comercioController.obtenerComerciosById);
         this.router.put('/:id', this.verifyToken, comercioController_1.comercioController.actualizarComercio);
+        this.router.delete('/:id', this.verifyToken, comercioController_1.comercioController.eliminarComercio);
         this.router.put('/:id/activar', this.verifyToken, comercioController_1.comercioController.activarComercio);
         this.router.put('/:id/registrarventa', this.verifyToken, comercioController_1.comercioController.registrarVenta);
+        this.router.put('/:id/registrarpago', this.verifyToken, comercioController_1.comercioController.registrarPago);
         this.router.put('/:id/desactivar', this.verifyToken, comercioController_1.comercioController.desactivarComercio);
         this.router.put('/calificar/:id', comercioController_1.comercioController.calificarComercio);
         this.router.get('/verificar/:id', this.verifyToken, comercioController_1.comercioController.verificarComercio);

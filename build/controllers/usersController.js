@@ -178,7 +178,11 @@ class UsersController {
             const cliente = yield Cliente_1.default.findOne({ _id: id });
             if (cliente) {
                 const comerciosFavoritos = yield Promise.all(cliente.favoritos.map((comercioId) => __awaiter(this, void 0, void 0, function* () {
-                    return yield Comercio_1.default.findOne({ _id: comercioId });
+                    yield Comercio_1.default.findOne({ _id: comercioId })
+                        .catch((err) => {
+                        console.log(err);
+                        return res.status(404).json({ msg: 'Error al obtener comercio fav.' });
+                    });
                 })));
                 return res.status(200).json(comerciosFavoritos);
             }

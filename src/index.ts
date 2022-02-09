@@ -11,6 +11,9 @@ import productosRoutes from './routes/productosRoutes';
 import {connectDb} from './database';
 import pedidosRoutes from './routes/pedidosRoutes';
 import { sendEmail } from './config/mailer';
+import path from 'path';
+import imagesRoutes from './routes/imagesRoutes';
+
 
 const app =  express();
 const server = http.createServer(app);
@@ -28,9 +31,11 @@ app.use(express.urlencoded({extended: false}))
 //Routes
 app.use(indexRoutes);
 app.use('/api/comercios',comerciosRoutes);
+app.use('/api/images',imagesRoutes);
 app.use('/api/catalogo',productosRoutes);
 app.use('/api/pedidos',pedidosRoutes);
 app.use('/api/auth',usersRoutes);
+app.use('/uploads', express.static(path.resolve('uploads')));
 
 io.on('connection', (socket) => {
     const {comercioId} = socket.handshake.query;    

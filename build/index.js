@@ -33,6 +33,8 @@ const usersRoutes_1 = __importDefault(require("./routes/usersRoutes"));
 const productosRoutes_1 = __importDefault(require("./routes/productosRoutes"));
 const database_1 = require("./database");
 const pedidosRoutes_1 = __importDefault(require("./routes/pedidosRoutes"));
+const path_1 = __importDefault(require("path"));
+const imagesRoutes_1 = __importDefault(require("./routes/imagesRoutes"));
 const app = express_1.default();
 const server = http.createServer(app);
 const io = new socketIo.Server(server);
@@ -46,9 +48,11 @@ app.use(express_1.default.urlencoded({ extended: false }));
 //Routes
 app.use(indexRoutes_1.default);
 app.use('/api/comercios', comerciosRoutes_1.default);
+app.use('/api/images', imagesRoutes_1.default);
 app.use('/api/catalogo', productosRoutes_1.default);
 app.use('/api/pedidos', pedidosRoutes_1.default);
 app.use('/api/auth', usersRoutes_1.default);
+app.use('/uploads', express_1.default.static(path_1.default.resolve('uploads')));
 io.on('connection', (socket) => {
     const { comercioId } = socket.handshake.query;
     socket.join(comercioId);

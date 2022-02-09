@@ -12,11 +12,13 @@ class ComerciosRoutes {
         this.router.get('/', comercioController.obtenerComercios);
         this.router.post('/new', comercioController.crearComercio);
         this.router.get('/obtener', this.verifyToken ,comercioController.obtenerComerciosByUserId);
-        this.router.post('/filtrar/:filtro', this.verifyToken,comercioController.obtenerComerciosByFiltro);
+        this.router.get('/filtrar/:filtro', this.verifyToken,comercioController.obtenerComerciosByFiltro);
         this.router.get('/:id', this.verifyToken,comercioController.obtenerComerciosById);
         this.router.put('/:id', this.verifyToken ,comercioController.actualizarComercio);
+        this.router.delete('/:id', this.verifyToken ,comercioController.eliminarComercio);
         this.router.put('/:id/activar', this.verifyToken ,comercioController.activarComercio);
         this.router.put('/:id/registrarventa', this.verifyToken ,comercioController.registrarVenta);
+        this.router.put('/:id/registrarpago', this.verifyToken ,comercioController.registrarPago);
         this.router.put('/:id/desactivar', this.verifyToken ,comercioController.desactivarComercio);
         this.router.put('/calificar/:id',comercioController.calificarComercio);
         this.router.get('/verificar/:id', this.verifyToken ,comercioController.verificarComercio);

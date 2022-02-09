@@ -16,6 +16,10 @@ const ProductoSchema = new Schema({
         type: String,
         trim: true,
     },
+    imagenPath: {
+        type: String,
+        trim: true,
+    },
     precio: {
         type: Number,
         required: true,

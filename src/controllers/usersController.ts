@@ -154,11 +154,14 @@ class UsersController{
     public async obtenerFavoritos(req: Request, res: Response): Promise<Response<any>>{
         const {id} = req.params;
         const cliente = await Cliente.findOne({_id: id});
-
         if(cliente){
             const comerciosFavoritos = await Promise.all(
                 cliente.favoritos.map(async(comercioId: string)=>{
-                    return await Comercio.findOne({_id: comercioId})
+                    await Comercio.findOne({_id: comercioId})
+                    .catch((err: any)=> {
+                        console.log(err);
+                        return res.status(404).json({msg: 'Error al obtener comercio fav.'});
+                    });
                 })
             )
             

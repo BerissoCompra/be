@@ -4,20 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const productoController_1 = require("../controllers/productoController");
 const keys_1 = __importDefault(require("../keys"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-class ProductosRoutes {
+const imagesController_1 = require("../controllers/imagesController");
+const multer_1 = __importDefault(require("../libs/multer"));
+class ImagesRoutes {
     constructor() {
         this.router = express_1.Router();
         this.config();
     }
     config() {
-        //this.router.get('/:id', this.verifyToken, productoController.obtenerProductos);
-        this.router.get('/productos/:id', productoController_1.productoController.obtenerProductosPorComercio);
-        this.router.delete('/productos/:id', this.verifyToken, productoController_1.productoController.elimiarProducto);
-        this.router.put('/productos/:id', this.verifyToken, productoController_1.productoController.actualizarProducto);
-        this.router.post('/productos/nuevo', this.verifyToken, productoController_1.productoController.nuevoProducto);
+        this.router.post('/upload', this.verifyToken, multer_1.default.single('file'), imagesController_1.imagesController.subirImagen);
     }
     verifyToken(req, res, next) {
         if (!req.headers.authorization)
@@ -33,5 +30,5 @@ class ProductosRoutes {
         }
     }
 }
-const productosRoutes = new ProductosRoutes();
-exports.default = productosRoutes.router;
+const imagesRoutes = new ImagesRoutes();
+exports.default = imagesRoutes.router;
