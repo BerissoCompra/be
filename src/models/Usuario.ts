@@ -38,6 +38,12 @@ const UsuarioSchema = new Schema({
         trim: true,
         required: true,
     }, 
+    rol: {
+        type: String,
+        default: 'usuario',
+        trim: true,
+        required: true,
+    },
         
 }, {
     timestamps: true,

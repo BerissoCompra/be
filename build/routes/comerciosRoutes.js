@@ -19,6 +19,7 @@ class ComerciosRoutes {
         this.router.get('/obtener', this.verifyToken, comercioController_1.comercioController.obtenerComerciosByUserId);
         this.router.get('/filtrar/:filtro', this.verifyToken, comercioController_1.comercioController.obtenerComerciosByFiltro);
         this.router.get('/:id', this.verifyToken, comercioController_1.comercioController.obtenerComerciosById);
+        this.router.get('/:id/usuario', this.verifyToken, comercioController_1.comercioController.obtenerResponsableById);
         this.router.put('/:id', this.verifyToken, comercioController_1.comercioController.actualizarComercio);
         this.router.delete('/:id', this.verifyToken, comercioController_1.comercioController.eliminarComercio);
         this.router.put('/:id/activar', this.verifyToken, comercioController_1.comercioController.activarComercio);
@@ -27,6 +28,8 @@ class ComerciosRoutes {
         this.router.put('/:id/desactivar', this.verifyToken, comercioController_1.comercioController.desactivarComercio);
         this.router.put('/calificar/:id', comercioController_1.comercioController.calificarComercio);
         this.router.get('/verificar/:id', this.verifyToken, comercioController_1.comercioController.verificarComercio);
+        this.router.put('/:id/abrir', this.verifyToken, comercioController_1.comercioController.abrirComercio);
+        this.router.put('/:id/cerrar', this.verifyToken, comercioController_1.comercioController.cerrarComercio);
     }
     verifyToken(req, res, next) {
         if (!req.headers.authorization)

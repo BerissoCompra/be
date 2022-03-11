@@ -48,6 +48,10 @@ const ClienteSchema = new Schema({
         trim: true,
         required: false,
     },
+    finalizoTutorial: {
+        type: Boolean,
+        default: false,
+    },
     favoritos: []
         
 }, {

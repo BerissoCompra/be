@@ -8,7 +8,8 @@
     "build": "",
     "buildev": "tsc -w",
     "dev": "nodemon build/index.js",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "nuevo-modulo": "node ./test.js"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +29,7 @@
     "multer": "^1.4.4",
     "nodemailer": "^6.7.2",
     "socket.io": "^4.4.1",
+    "tesseract.js": "^2.1.5",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

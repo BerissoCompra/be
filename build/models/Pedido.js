@@ -12,16 +12,6 @@ const PedidoSchema = new mongoose_1.Schema({
         trim: true,
         required: true,
     },
-    nombreComercio: {
-        type: String,
-        trim: true,
-        required: true,
-    },
-    imagenComercio: {
-        type: String,
-        trim: true,
-        required: true,
-    },
     nombreUsuario: {
         type: String,
         trim: true,

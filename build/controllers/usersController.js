@@ -33,18 +33,23 @@ const CodigosRecuperacion_1 = __importDefault(require("../models/CodigosRecupera
 const mailer_1 = require("../config/mailer");
 class UsersController {
     iniciarSesion(req, res) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = req.body;
             const usuarioExiste = yield Usuario_1.default.find({ email: email, password: password });
             if (usuarioExiste.length > 0) {
-                const activado = yield usuarioExiste[0].emailActivado;
-                const data = JSON.stringify({ uid: usuarioExiste[0]._id });
+                let activado = yield usuarioExiste[0].emailActivado;
+                let data = JSON.stringify({ uid: usuarioExiste[0]._id });
+                if ((_a = usuarioExiste[0]) === null || _a === void 0 ? void 0 : _a.rol) {
+                    data = JSON.stringify({ uid: usuarioExiste[0]._id, rol: (_b = usuarioExiste[0]) === null || _b === void 0 ? void 0 : _b.rol });
+                    activado = true;
+                }
                 const token = jsonwebtoken_1.default.sign(data, keys_1.default.seckey);
                 console.log(activado);
                 return yield res.status(200).json({ token: token, activado });
             }
             else {
-                return yield res.status(500).json({ error: 'El usuario y/o contraseña son incorrectos' });
+                return yield res.status(500).json({ msg: 'El usuario y/o contraseña son incorrectos' });
             }
         });
     }
@@ -60,7 +65,11 @@ class UsersController {
                 const usuarioRegistrado = yield nuevoUsuario.save();
                 if (usuarioRegistrado) {
                     const urlActivacion = `http://localhost:4200/accountverify/${usuarioRegistrado._id}`;
-                    const html = `<h2>Aplicación ciudad | Haz click para activar:</h2><a href="${urlActivacion}">AQUI</a>`;
+                    const html = `<div style="">
+                <h2 style="text-align: center; color: #333;">Verificación de Cuenta</h2>
+                <p style="text-align: center; color: blueviolet;">Haz click en el siguiente enlace para verificar su cuenta</p>
+                <a href="${urlActivacion}" style="text-align: center; background-color: blueviolet; color: #fff; padding: 10px; text-decoration: none; margin: 0 auto;">VERIFICAR</a>
+                </div>`;
                     yield mailer_1.sendEmail('Activar Cuenta | Responsable de Comercio', email, 'Servicio de activación', html);
                     return res.status(200).json({ _id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre });
                 }
@@ -74,15 +83,13 @@ class UsersController {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = req.body;
             const usuarioExiste = yield Cliente_1.default.find({ email: email, password: password });
-            console.log(email, password);
-            console.log(usuarioExiste);
             if (usuarioExiste.length > 0) {
                 const data = JSON.stringify({ uid: usuarioExiste[0]._id });
                 const token = jsonwebtoken_1.default.sign(data, keys_1.default.seckey);
-                return res.status(200).json({ token });
+                return res.status(200).json({ token, finalizoTutorial: usuarioExiste[0].finalizoTutorial });
             }
             else {
-                return res.status(404).json({ error: 'El usuario y/o contraseña son incorrectos' });
+                return res.status(404).json({ msg: 'El usuario y/o contraseña son incorrectos' });
             }
         });
     }
@@ -124,7 +131,6 @@ class UsersController {
             else {
                 const nuevoUsuario = new Cliente_1.default(req.body);
                 const usuarioRegistrado = yield nuevoUsuario.save();
-                console.log(nuevoUsuario);
                 if (usuarioRegistrado) {
                     return res.status(200).json({ _id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre });
                 }
@@ -153,7 +159,7 @@ class UsersController {
             const { comercioId } = req.body;
             let nuevosFavoritos = [];
             let respuesta = false;
-            const cliente = yield Cliente_1.default.findOne({ _id: id });
+            const cliente = yield Cliente_1.default.findById(id);
             if (cliente) {
                 const existe = cliente.favoritos.filter((fav) => fav === comercioId);
                 if (existe.length > 0) {
@@ -177,8 +183,14 @@ class UsersController {
             const { id } = req.params;
             const cliente = yield Cliente_1.default.findOne({ _id: id });
             if (cliente) {
-                const comerciosFavoritos = yield Promise.all(cliente.favoritos.map((comercioId) => __awaiter(this, void 0, void 0, function* () {
-                    yield Comercio_1.default.findOne({ _id: comercioId })
+                let comerciosFavoritos = [];
+                yield Promise.all(cliente.favoritos.map((comercioId) => __awaiter(this, void 0, void 0, function* () {
+                    yield Comercio_1.default.findById(comercioId)
+                        .then((comercio) => {
+                        if (comercio) {
+                            comerciosFavoritos = [...comerciosFavoritos, comercio];
+                        }
+                    })
                         .catch((err) => {
                         console.log(err);
                         return res.status(404).json({ msg: 'Error al obtener comercio fav.' });

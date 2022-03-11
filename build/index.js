@@ -35,6 +35,19 @@ const database_1 = require("./database");
 const pedidosRoutes_1 = __importDefault(require("./routes/pedidosRoutes"));
 const path_1 = __importDefault(require("path"));
 const imagesRoutes_1 = __importDefault(require("./routes/imagesRoutes"));
+const publicidadRoutes_1 = __importDefault(require("./routes/publicidadRoutes"));
+// const worker = createWorker({
+//   logger: m => console.log(m)
+// });
+// const reconocerImagen = async () => {
+//   await worker.load();
+//   await worker.loadLanguage('spa');
+//   await worker.initialize('spa');
+//   const { data: { text } } = await worker.recognize('https://www.elciudadanoweb.com/wp-content/uploads/2020/11/dni.jpg'); 
+//   console.log(text);
+//   await worker.terminate();
+// };
+// reconocerImagen();
 const app = express_1.default();
 const server = http.createServer(app);
 const io = new socketIo.Server(server);
@@ -52,6 +65,7 @@ app.use('/api/images', imagesRoutes_1.default);
 app.use('/api/catalogo', productosRoutes_1.default);
 app.use('/api/pedidos', pedidosRoutes_1.default);
 app.use('/api/auth', usersRoutes_1.default);
+app.use('/api/publicidad', publicidadRoutes_1.default);
 app.use('/uploads', express_1.default.static(path_1.default.resolve('uploads')));
 io.on('connection', (socket) => {
     const { comercioId } = socket.handshake.query;

@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -18,6 +29,8 @@ const tipo_filtro_enum_1 = require("../models/enum/tipo-filtro.enum");
 const Usuario_1 = __importDefault(require("../models/Usuario"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const path_1 = __importDefault(require("path"));
+const Comercio_2 = __importDefault(require("../models/Comercio"));
+const Producto_1 = __importDefault(require("../models/Producto"));
 class ComercioController {
     crearComercio(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -49,13 +62,41 @@ class ComercioController {
     obtenerComerciosById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
+            if (!id) {
+                return res.status(404);
+            }
             const comercio = yield Comercio_1.default.findById(id)
                 .then()
                 .catch((err) => {
                 console.log(err);
                 return res.status(404).json({ msg: 'Error al obtener comercio.' });
             });
-            return res.status(200).json(comercio);
+            const productos = yield Producto_1.default.find({ comercioId: comercio._id });
+            return res.status(200).json({ productos, comercio });
+        });
+    }
+    obtenerResponsableById(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const comercio = yield Comercio_2.default.findById(id)
+                .then()
+                .catch((err) => {
+                console.log(err);
+                return res.status(404).json({ msg: 'Error al obtener responsable.' });
+            });
+            if (comercio === null || comercio === void 0 ? void 0 : comercio.usuarioId) {
+                const usuario = yield Usuario_1.default.findById(comercio.usuarioId)
+                    .then()
+                    .catch((err) => {
+                    console.log(err);
+                    return res.status(404).json({ msg: 'Error al obtener responsable.' });
+                });
+                const { password } = usuario, rest = __rest(usuario, ["password"]);
+                return res.status(200).json(rest);
+            }
+            else {
+                return res.status(404).json({ msg: 'Error al obtener responsable.' });
+            }
         });
     }
     obtenerComerciosByFiltro(req, res) {
@@ -112,7 +153,7 @@ class ComercioController {
                 console.log(err);
                 return res.status(404).json({ msg: 'Error al actualizar producto.' });
             });
-            if (comercio.imagenPath) {
+            if (comercio.imagenPath && comercio.imagenPath != req.body.imagenPath) {
                 yield fs_extra_1.default.unlink(path_1.default.resolve(comercio.imagenPath))
                     .then(() => { console.log("Imagen anterior eliminada"); })
                     .catch((err) => console.log(err));
@@ -129,6 +170,28 @@ class ComercioController {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             yield Comercio_1.default.updateOne({ _id: id }, { activado: true }).then((ok) => {
+                return res.status(200).json(ok);
+            })
+                .catch((err) => {
+                return res.status(404).json({ msg: 'No se pudo actualizar' });
+            });
+        });
+    }
+    abrirComercio(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            yield Comercio_1.default.updateOne({ _id: id }, { abierto: true }).then((ok) => {
+                return res.status(200).json(ok);
+            })
+                .catch((err) => {
+                return res.status(404).json({ msg: 'No se pudo actualizar' });
+            });
+        });
+    }
+    cerrarComercio(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            yield Comercio_1.default.updateOne({ _id: id }, { abierto: false }).then((ok) => {
                 return res.status(200).json(ok);
             })
                 .catch((err) => {
@@ -260,7 +323,13 @@ class ComercioController {
                 return res.status(404).json({ msg: 'Error al eliminar comercio.' });
             });
             if (comercio) {
-                yield fs_extra_1.default.unlink(path_1.default.resolve(comercio.imagenPath));
+                if (comercio.imagenPath) {
+                    yield fs_extra_1.default.unlink(path_1.default.resolve(comercio.imagenPath))
+                        .then()
+                        .catch((err) => {
+                        console.log(err);
+                    });
+                }
                 yield Comercio_1.default.findByIdAndDelete(id)
                     .then(() => __awaiter(this, void 0, void 0, function* () {
                     yield Usuario_1.default.findByIdAndDelete(comercio.usuarioId)

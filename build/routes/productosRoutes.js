@@ -17,6 +17,8 @@ class ProductosRoutes {
         this.router.get('/productos/:id', productoController_1.productoController.obtenerProductosPorComercio);
         this.router.delete('/productos/:id', this.verifyToken, productoController_1.productoController.elimiarProducto);
         this.router.put('/productos/:id', this.verifyToken, productoController_1.productoController.actualizarProducto);
+        this.router.put('/productos/:id/activar', this.verifyToken, productoController_1.productoController.activarProducto);
+        this.router.put('/productos/:id/desactivar', this.verifyToken, productoController_1.productoController.desactivarProducto);
         this.router.post('/productos/nuevo', this.verifyToken, productoController_1.productoController.nuevoProducto);
     }
     verifyToken(req, res, next) {

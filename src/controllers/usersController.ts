@@ -13,14 +13,18 @@ class UsersController{
         const {email, password} = req.body;
         const usuarioExiste = await Usuario.find({email: email, password: password})
         if(usuarioExiste.length > 0){
-            const activado: boolean = await usuarioExiste[0].emailActivado;
-            const data = JSON.stringify({uid: usuarioExiste[0]._id});
+            let activado: boolean = await usuarioExiste[0].emailActivado;
+            let  data = JSON.stringify({uid: usuarioExiste[0]._id});
+            if(usuarioExiste[0]?.rol){
+                data = JSON.stringify({uid: usuarioExiste[0]._id, rol: usuarioExiste[0]?.rol});
+                activado = true;
+            }
             const token = jwt.sign(data, keys.seckey)
             console.log(activado)
             return await res.status(200).json({token: token, activado});
         }
         else{
-            return await res.status(500).json({error: 'El usuario y/o contraseña son incorrectos'})
+            return await res.status(500).json({msg: 'El usuario y/o contraseña son incorrectos'})
         }
     }
   
@@ -33,10 +37,14 @@ class UsersController{
         }
         else{
             const nuevoUsuario = new Usuario(req.body);
-            const usuarioRegistrado = await nuevoUsuario.save()
+            const usuarioRegistrado = await nuevoUsuario.save() 
             if(usuarioRegistrado){
                 const urlActivacion = `http://localhost:4200/accountverify/${usuarioRegistrado._id}`
-                const html = `<h2>Aplicación ciudad | Haz click para activar:</h2><a href="${urlActivacion}">AQUI</a>`;
+                const html = `<div style="">
+                <h2 style="text-align: center; color: #333;">Verificación de Cuenta</h2>
+                <p style="text-align: center; color: blueviolet;">Haz click en el siguiente enlace para verificar su cuenta</p>
+                <a href="${urlActivacion}" style="text-align: center; background-color: blueviolet; color: #fff; padding: 10px; text-decoration: none; margin: 0 auto;">VERIFICAR</a>
+                </div>`;
                 await sendEmail('Activar Cuenta | Responsable de Comercio', email, 'Servicio de activación', html)
                 return res.status(200).json({_id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre});
             }
@@ -49,15 +57,14 @@ class UsersController{
     public async iniciarSesionCliente(req: Request, res: Response){
         const {email, password} = req.body;
         const usuarioExiste = await Cliente.find({email: email, password: password})
-        console.log(email, password)
-        console.log(usuarioExiste)
+
         if(usuarioExiste.length > 0){
             const data = JSON.stringify({uid: usuarioExiste[0]._id});
             const token = jwt.sign(data, keys.seckey)
-            return res.status(200).json({token});
+            return res.status(200).json({token, finalizoTutorial: usuarioExiste[0].finalizoTutorial});
         }
         else{
-            return res.status(404).json({error: 'El usuario y/o contraseña son incorrectos'})
+            return res.status(404).json({msg: 'El usuario y/o contraseña son incorrectos'})
         }
     }
 
@@ -100,7 +107,6 @@ class UsersController{
         else{
             const nuevoUsuario = new Cliente(req.body);
             const usuarioRegistrado = await nuevoUsuario.save()
-            console.log(nuevoUsuario)
             if(usuarioRegistrado){
                 return res.status(200).json({_id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre});
             }
@@ -129,7 +135,7 @@ class UsersController{
         let nuevosFavoritos: any[] = [];
         let respuesta: boolean = false;
 
-        const cliente = await Cliente.findOne({_id: id});
+        const cliente = await Cliente.findById(id);
 
         if(cliente){
             const existe = cliente.favoritos.filter((fav: string)=> fav === comercioId);
@@ -155,9 +161,15 @@ class UsersController{
         const {id} = req.params;
         const cliente = await Cliente.findOne({_id: id});
         if(cliente){
-            const comerciosFavoritos = await Promise.all(
+            let comerciosFavoritos: any[] = [];
+            await Promise.all(
                 cliente.favoritos.map(async(comercioId: string)=>{
-                    await Comercio.findOne({_id: comercioId})
+                    await Comercio.findById(comercioId)
+                    .then((comercio)=>{
+                        if(comercio){
+                            comerciosFavoritos = [...comerciosFavoritos, comercio]
+                        }
+                    })
                     .catch((err: any)=> {
                         console.log(err);
                         return res.status(404).json({msg: 'Error al obtener comercio fav.'});

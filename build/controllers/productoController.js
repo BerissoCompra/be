@@ -62,7 +62,7 @@ class ProductoController {
             const { id } = req.params;
             const obtenerProducto = yield Producto_1.default.findById(id);
             //Elimino la imagen anterior
-            if (obtenerProducto.imagenPath) {
+            if (obtenerProducto.imagenPath && obtenerProducto.imagenPath != req.body.imagenPath) {
                 yield fs_extra_1.default.unlink(path_1.default.resolve(obtenerProducto.imagenPath))
                     .then(() => { console.log("Img eliminada"); })
                     .catch((err) => { console.log(err); });
@@ -78,6 +78,32 @@ class ProductoController {
             else {
                 return res.status(404).json({ msg: 'El producto no se puede actualizar.' });
             }
+        });
+    }
+    activarProducto(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            yield Producto_1.default.findByIdAndUpdate(id, { activo: true })
+                .then(() => {
+                return res.status(202).json({ msg: 'Activado.' });
+            })
+                .catch((err) => {
+                console.log(err);
+                return res.status(404).json({ msg: 'El producto no se puede activar.' });
+            });
+        });
+    }
+    desactivarProducto(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            yield Producto_1.default.findByIdAndUpdate(id, { activo: false })
+                .then(() => {
+                return res.status(202).json({ msg: 'Desactivado.' });
+            })
+                .catch((err) => {
+                console.log(err);
+                return res.status(404).json({ msg: 'El producto no se puede desactivar.' });
+            });
         });
     }
     obtenerProductosPorComercio(req, res) {

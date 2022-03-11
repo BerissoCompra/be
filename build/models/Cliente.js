@@ -49,6 +49,10 @@ const ClienteSchema = new mongoose_1.Schema({
         trim: true,
         required: false,
     },
+    finalizoTutorial: {
+        type: Boolean,
+        default: false,
+    },
     favoritos: []
 }, {
     timestamps: true,

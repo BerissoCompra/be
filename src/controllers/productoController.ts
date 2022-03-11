@@ -52,7 +52,7 @@ class ProductoController{
         const obtenerProducto = await ProductoModel.findById(id);
         
         //Elimino la imagen anterior
-        if(obtenerProducto.imagenPath){
+        if(obtenerProducto.imagenPath && obtenerProducto.imagenPath != req.body.imagenPath){
             await fs.unlink(path.resolve(obtenerProducto.imagenPath))
             .then(()=>{console.log("Img eliminada")})
             .catch((err)=>{console.log(err)})
@@ -70,6 +70,32 @@ class ProductoController{
         else{
             return res.status(404).json({msg: 'El producto no se puede actualizar.'});
         }
+    }
+
+    public async activarProducto(req: any, res: Response): Promise<any>{
+        const {id} = req.params;
+        await ProductoModel.findByIdAndUpdate(id, {activo: true})
+        .then(()=>{
+            return res.status(202).json({msg: 'Activado.'});
+        })
+        .catch((err)=>{
+            console.log(err)
+            return res.status(404).json({msg: 'El producto no se puede activar.'});
+        })
+
+    }
+
+    public async desactivarProducto(req: any, res: Response): Promise<any>{
+        const {id} = req.params;
+        await ProductoModel.findByIdAndUpdate(id, {activo: false})
+        .then(()=>{
+            return res.status(202).json({msg: 'Desactivado.'});
+        })
+        .catch((err)=>{
+            console.log(err)
+            return res.status(404).json({msg: 'El producto no se puede desactivar.'});
+        })
+
     }
 
     public async obtenerProductosPorComercio(req: any, res: Response): Promise<any>{

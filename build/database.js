@@ -16,8 +16,8 @@ dotenv.config();
 function connectDb() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const db = yield mongoose_1.connect(process.env.DB_CONNECTION_DEV);
-            //const db = await connect(process.env.DB_CONNECTION_LOC as string);
+            // const db = await connect(process.env.DB_CONNECTION_DEV as string);
+            const db = yield mongoose_1.connect(process.env.DB_CONNECTION_LOC);
             console.log("db connected", db.connection.name);
         }
         catch (error) {

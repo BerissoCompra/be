@@ -39,6 +39,12 @@ const UsuarioSchema = new mongoose_1.Schema({
         trim: true,
         required: true,
     },
+    rol: {
+        type: String,
+        default: 'usuario',
+        trim: true,
+        required: true,
+    },
 }, {
     timestamps: true,
     versionKey: false,

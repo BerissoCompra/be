@@ -5,6 +5,8 @@ import { TipoFiltroEnum } from '../models/enum/tipo-filtro.enum';
 import Usuario from '../models/Usuario';
 import fs from 'fs-extra';
 import path from 'path';
+import Comercio from '../models/Comercio';
+import Producto from '../models/Producto';
 
 class ComercioController{
 
@@ -37,14 +39,44 @@ class ComercioController{
 
     public async obtenerComerciosById(req: Request, res: Response){
         const {id} = req.params;
+
+        if(!id){
+            return res.status(404)
+        } 
+
         const comercio = await ComercioModel.findById(id)
         .then()
-        .catch((err: any)=> {
+        .catch((err: any)=> { 
             console.log(err);
             return res.status(404).json({msg: 'Error al obtener comercio.'});
         });
+        const productos = await Producto.find({comercioId: comercio._id})
+        return res.status(200).json({productos, comercio});
+    }  
 
-        return res.status(200).json(comercio);
+    public async obtenerResponsableById(req: Request, res: Response){
+        const {id} = req.params;
+        const comercio = await Comercio.findById(id)
+        .then()
+        .catch((err: any)=> {
+            console.log(err);
+            return res.status(404).json({msg: 'Error al obtener responsable.'});
+        });
+
+        if(comercio?.usuarioId){
+            const usuario = await Usuario.findById(comercio.usuarioId)
+            .then()
+            .catch((err: any)=> {
+                console.log(err);
+                return res.status(404).json({msg: 'Error al obtener responsable.'});
+            });
+            const {password, ...rest} = usuario
+            return res.status(200).json(rest);
+        }
+        else{
+            return res.status(404).json({msg: 'Error al obtener responsable.'});
+        }
+        
     }
 
     public async obtenerComerciosByFiltro(req: any, res: Response){
@@ -104,14 +136,14 @@ class ComercioController{
             return res.status(404).json({msg: 'Error al actualizar producto.'});
         });
 
-        if(comercio.imagenPath){
+        if(comercio.imagenPath && comercio.imagenPath != req.body.imagenPath){
             await fs.unlink(path.resolve(comercio.imagenPath))
             .then(()=>{console.log("Imagen anterior eliminada")})
             .catch((err)=> console.log(err))
-        }
+        }  
         
         await ComercioModel.findByIdAndUpdate(id, req.body).then((ok)=>{
-            return res.status(200).json(ok);
+            return res.status(200).json(ok); 
         })
         .catch((err)=>{
             return res.status(404).json({msg: 'No se pudo actualizar'});
@@ -121,6 +153,26 @@ class ComercioController{
     public async activarComercio(req: any, res: Response){
         const {id} = req.params;
         await ComercioModel.updateOne({_id: id}, {activado: true}).then((ok)=>{
+            return res.status(200).json(ok);
+        })
+        .catch((err)=>{
+            return res.status(404).json({msg: 'No se pudo actualizar'});
+        })      
+    }
+
+    public async abrirComercio(req: any, res: Response){
+        const {id} = req.params;
+        await ComercioModel.updateOne({_id: id}, {abierto: true}).then((ok)=>{
+            return res.status(200).json(ok);
+        })
+        .catch((err)=>{
+            return res.status(404).json({msg: 'No se pudo actualizar'});
+        })      
+    }
+
+    public async cerrarComercio(req: any, res: Response){
+        const {id} = req.params;
+        await ComercioModel.updateOne({_id: id}, {abierto: false}).then((ok)=>{
             return res.status(200).json(ok);
         })
         .catch((err)=>{
@@ -270,7 +322,14 @@ class ComercioController{
         });
 
         if(comercio){
-            await fs.unlink(path.resolve(comercio.imagenPath))
+            if(comercio.imagenPath){
+                await fs.unlink(path.resolve(comercio.imagenPath))
+                .then()
+                .catch((err)=>{
+                    console.log(err)
+                })
+            }
+
             await ComercioModel.findByIdAndDelete(id)
             .then(async()=>{
                 await Usuario.findByIdAndDelete(comercio.usuarioId)

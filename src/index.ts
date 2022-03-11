@@ -13,7 +13,23 @@ import pedidosRoutes from './routes/pedidosRoutes';
 import { sendEmail } from './config/mailer';
 import path from 'path';
 import imagesRoutes from './routes/imagesRoutes';
+import publicidadRoutes from './routes/publicidadRoutes';
+import { createWorker } from 'tesseract.js';
 
+// const worker = createWorker({
+//   logger: m => console.log(m)
+// });
+
+// const reconocerImagen = async () => {
+//   await worker.load();
+//   await worker.loadLanguage('spa');
+//   await worker.initialize('spa');
+//   const { data: { text } } = await worker.recognize('https://www.elciudadanoweb.com/wp-content/uploads/2020/11/dni.jpg'); 
+//   console.log(text);
+//   await worker.terminate();
+// };
+
+// reconocerImagen();
 
 const app =  express();
 const server = http.createServer(app);
@@ -35,6 +51,7 @@ app.use('/api/images',imagesRoutes);
 app.use('/api/catalogo',productosRoutes);
 app.use('/api/pedidos',pedidosRoutes);
 app.use('/api/auth',usersRoutes);
+app.use('/api/publicidad',publicidadRoutes);
 app.use('/uploads', express.static(path.resolve('uploads')));
 
 io.on('connection', (socket) => {

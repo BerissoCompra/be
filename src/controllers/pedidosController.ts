@@ -3,6 +3,7 @@ import keys from '../keys';
 import jwt from 'jsonwebtoken';
 import Usuario from '../models/Usuario';
 import Pedido from '../models/Pedido';
+import Comercio from '../models/Comercio';
 
 class PedidosController{
 
@@ -20,9 +21,18 @@ class PedidosController{
 
     public async obtenerPedidosId(req: Request, res: Response){
         const {id} = req.params;
-        const pedidos = await Pedido.find({_id: id})
-        if(pedidos.length > 0){
-            return res.status(200).json(pedidos[0]);
+        const pedidos = await Pedido.findById(id)
+        .then()
+        .catch((err)=>{
+            console.log(err)
+            return res.status(404).json({ok: 'No se encontraron pedidos'});
+        })
+        if(pedidos){
+            let pedidoResponse: any = {};
+            const comercioId = pedidos;
+            const comercio = await Comercio.findById(comercioId);
+            pedidoResponse = {pedidos, comercio}
+            return res.status(200).json(pedidoResponse);
         }
         else{
             return res.status(404).json({ok: 'No se encontraron pedidos'});
@@ -31,9 +41,21 @@ class PedidosController{
 
     public async obtenerPedidosCliente(req: Request, res: Response){
         const {id} = req.params;
-        const pedidos = await Pedido.find({clienteId: id})
+        const pedidos: any[] = await Pedido.find({clienteId: id})
         if(pedidos){
-            return res.status(200).json(pedidos);
+
+            let pedidosResponse: any[] = [];
+
+            await Promise.all(
+                pedidos.map(async(pedido)=>{
+                    const comercioId = pedido.comercioId;
+                    const comercio = await Comercio.findById(comercioId);
+                    const pedidoCompleto = {...pedido._doc, comercio};
+                    pedidosResponse.push(pedidoCompleto);
+                })
+            )
+
+           return res.status(200).json(pedidosResponse);
         }
         else{
             return res.status(404).json({ok: 'No se encontraron pedidos'});

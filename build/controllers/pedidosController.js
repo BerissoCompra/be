@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pedidosController = void 0;
 const Pedido_1 = __importDefault(require("../models/Pedido"));
+const Comercio_1 = __importDefault(require("../models/Comercio"));
 class PedidosController {
     crearPedido(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,9 +32,18 @@ class PedidosController {
     obtenerPedidosId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const pedidos = yield Pedido_1.default.find({ _id: id });
-            if (pedidos.length > 0) {
-                return res.status(200).json(pedidos[0]);
+            const pedidos = yield Pedido_1.default.findById(id)
+                .then()
+                .catch((err) => {
+                console.log(err);
+                return res.status(404).json({ ok: 'No se encontraron pedidos' });
+            });
+            if (pedidos) {
+                let pedidoResponse = {};
+                const comercioId = pedidos;
+                const comercio = yield Comercio_1.default.findById(comercioId);
+                pedidoResponse = { pedidos, comercio };
+                return res.status(200).json(pedidoResponse);
             }
             else {
                 return res.status(404).json({ ok: 'No se encontraron pedidos' });
@@ -45,7 +55,14 @@ class PedidosController {
             const { id } = req.params;
             const pedidos = yield Pedido_1.default.find({ clienteId: id });
             if (pedidos) {
-                return res.status(200).json(pedidos);
+                let pedidosResponse = [];
+                yield Promise.all(pedidos.map((pedido) => __awaiter(this, void 0, void 0, function* () {
+                    const comercioId = pedido.comercioId;
+                    const comercio = yield Comercio_1.default.findById(comercioId);
+                    const pedidoCompleto = Object.assign(Object.assign({}, pedido._doc), { comercio });
+                    pedidosResponse.push(pedidoCompleto);
+                })));
+                return res.status(200).json(pedidosResponse);
             }
             else {
                 return res.status(404).json({ ok: 'No se encontraron pedidos' });

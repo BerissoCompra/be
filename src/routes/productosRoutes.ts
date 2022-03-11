@@ -1,9 +1,7 @@
-import {NextFunction, Router} from 'express';
+import {Router} from 'express';
 import { productoController} from '../controllers/productoController';
-import {Request, Response} from 'express';
 import keys from '../keys';
 import jwt from 'jsonwebtoken';
-import multer from '../libs/multer';
 
 class ProductosRoutes {
     public router: Router = Router();
@@ -15,6 +13,8 @@ class ProductosRoutes {
         this.router.get('/productos/:id', productoController.obtenerProductosPorComercio);
         this.router.delete('/productos/:id', this.verifyToken, productoController.elimiarProducto);
         this.router.put('/productos/:id', this.verifyToken ,productoController.actualizarProducto);
+        this.router.put('/productos/:id/activar', this.verifyToken ,productoController.activarProducto);
+        this.router.put('/productos/:id/desactivar', this.verifyToken ,productoController.desactivarProducto);
         this.router.post('/productos/nuevo', this.verifyToken, productoController.nuevoProducto);
     }
 
