@@ -19,7 +19,8 @@ class PublicidadController {
     obtenerComerciosPublicidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { tipo } = req.params;
-            const comerciosPublicidad = yield Publicidad_1.default.find({ tipo });
+            var rand = Math.random();
+            const comerciosPublicidad = yield Publicidad_1.default.find({ tipo }).sort({ rand: 1 });
             let response = [];
             if (comerciosPublicidad.length > 0) {
                 yield Promise.all(comerciosPublicidad.map((publicidad) => __awaiter(this, void 0, void 0, function* () {

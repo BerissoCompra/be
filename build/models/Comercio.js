@@ -50,7 +50,7 @@ const comercioSchema = new mongoose_1.Schema({
     },
     pagoEfectivo: {
         type: Boolean,
-        default: false,
+        default: true,
     },
     retiro: {
         type: Boolean,

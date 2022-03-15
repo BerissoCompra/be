@@ -32,17 +32,17 @@ class PedidosController {
     obtenerPedidosId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const pedidos = yield Pedido_1.default.findById(id)
+            const pedido = yield Pedido_1.default.findById(id)
                 .then()
                 .catch((err) => {
                 console.log(err);
                 return res.status(404).json({ ok: 'No se encontraron pedidos' });
             });
-            if (pedidos) {
+            if (pedido) {
                 let pedidoResponse = {};
-                const comercioId = pedidos;
+                const { comercioId } = pedido;
                 const comercio = yield Comercio_1.default.findById(comercioId);
-                pedidoResponse = { pedidos, comercio };
+                pedidoResponse = { pedido, comercio };
                 return res.status(200).json(pedidoResponse);
             }
             else {

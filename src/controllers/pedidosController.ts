@@ -21,17 +21,17 @@ class PedidosController{
 
     public async obtenerPedidosId(req: Request, res: Response){
         const {id} = req.params;
-        const pedidos = await Pedido.findById(id)
+        const pedido = await Pedido.findById(id)
         .then()
         .catch((err)=>{
             console.log(err)
             return res.status(404).json({ok: 'No se encontraron pedidos'});
         })
-        if(pedidos){
+        if(pedido){
             let pedidoResponse: any = {};
-            const comercioId = pedidos;
-            const comercio = await Comercio.findById(comercioId);
-            pedidoResponse = {pedidos, comercio}
+            const {comercioId} = pedido;
+            const comercio = await Comercio.findById(comercioId);   
+            pedidoResponse = {pedido, comercio} 
             return res.status(200).json(pedidoResponse);
         }
         else{

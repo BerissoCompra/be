@@ -35,7 +35,7 @@ class UsersController{
         if(usuarioExiste.length > 0){
             return res.status(200).json({msg: 'El email ingresado ya se encuentra registrado.'});
         }
-        else{
+        else{ 
             const nuevoUsuario = new Usuario(req.body);
             const usuarioRegistrado = await nuevoUsuario.save() 
             if(usuarioRegistrado){

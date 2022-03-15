@@ -8,7 +8,8 @@ class PublicidadController{
      
     public async obtenerComerciosPublicidad(req: any, res: Response){
         const {tipo} = req.params;
-        const comerciosPublicidad = await Publicidad.find({tipo})
+        var rand = Math.random();
+        const comerciosPublicidad = await Publicidad.find({tipo}).sort({ rand: 1 })
         let response: any[] = [];
         if(comerciosPublicidad.length > 0){
             await Promise.all(comerciosPublicidad.map(async(publicidad: PublicidadInterface)=>{

@@ -49,7 +49,7 @@ const comercioSchema = new Schema({
     }, 
     pagoEfectivo: {
         type: Boolean,
-        default: false,
+        default: true,
     }, 
     retiro: {
         type: Boolean,
