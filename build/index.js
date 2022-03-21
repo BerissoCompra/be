@@ -36,6 +36,7 @@ const pedidosRoutes_1 = __importDefault(require("./routes/pedidosRoutes"));
 const path_1 = __importDefault(require("path"));
 const imagesRoutes_1 = __importDefault(require("./routes/imagesRoutes"));
 const publicidadRoutes_1 = __importDefault(require("./routes/publicidadRoutes"));
+const categoriasRoutest_1 = __importDefault(require("./routes/categoriasRoutest"));
 // const worker = createWorker({
 //   logger: m => console.log(m)
 // });
@@ -66,6 +67,7 @@ app.use('/api/catalogo', productosRoutes_1.default);
 app.use('/api/pedidos', pedidosRoutes_1.default);
 app.use('/api/auth', usersRoutes_1.default);
 app.use('/api/publicidad', publicidadRoutes_1.default);
+app.use('/api/categorias', categoriasRoutest_1.default);
 app.use('/uploads', express_1.default.static(path_1.default.resolve('uploads')));
 io.on('connection', (socket) => {
     const { comercioId } = socket.handshake.query;

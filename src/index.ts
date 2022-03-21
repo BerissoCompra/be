@@ -15,6 +15,7 @@ import path from 'path';
 import imagesRoutes from './routes/imagesRoutes';
 import publicidadRoutes from './routes/publicidadRoutes';
 import { createWorker } from 'tesseract.js';
+import categoriasRoutest from './routes/categoriasRoutest';
 
 // const worker = createWorker({
 //   logger: m => console.log(m)
@@ -52,6 +53,7 @@ app.use('/api/catalogo',productosRoutes);
 app.use('/api/pedidos',pedidosRoutes);
 app.use('/api/auth',usersRoutes);
 app.use('/api/publicidad',publicidadRoutes);
+app.use('/api/categorias',categoriasRoutest);
 app.use('/uploads', express.static(path.resolve('uploads')));
 
 io.on('connection', (socket) => {
