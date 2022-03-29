@@ -223,6 +223,13 @@ class UsersController {
             }
         });
     }
+    updateCliente(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const usuarioActualizado = yield Cliente_1.default.findByIdAndUpdate(req.params.id, req.body)
+                .then(() => { return res.status(200).json({ msg: 'Actualizado' }); })
+                .catch(err => { console.log(err); return res.status(404).json({ msg: 'No se pudo actualizar' }); });
+        });
+    }
     verificarCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, codigo } = req.body;

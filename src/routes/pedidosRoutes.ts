@@ -12,8 +12,9 @@ class PedidosRoutes {
         this.router.get('/:id', this.verifyToken ,pedidosController.obtenerPedidosId);
         this.router.get('/cliente/:id', this.verifyToken ,pedidosController.obtenerPedidosCliente);
         this.router.get('/comercio/:id/:estado', this.verifyToken ,pedidosController.obtenerPedidosComercios);
-        this.router.post('/:id', this.verifyToken, pedidosController.crearPedido);
-        this.router.put('/:id', this.verifyToken, pedidosController.actualizarPedido);
+        this.router.post('/crear', this.verifyToken, pedidosController.crearPedido);
+        this.router.put('/:id', this.verifyToken, pedidosController.cambiarEstadoPedido);
+        this.router.get('/:id/ticket', this.verifyToken, pedidosController.obtenerTicket);
         this.router.delete('/:id', this.verifyToken, pedidosController.eliminarPedido);
     }
 
@@ -27,8 +28,8 @@ class PedidosRoutes {
         }
         else{ 
             return res.status(401).json('No Token');
-        }
-    }   
+        } 
+    }    
 }
 
 

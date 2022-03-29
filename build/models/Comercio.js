@@ -61,6 +61,7 @@ const comercioSchema = new mongoose_1.Schema({
         trim: true,
     },
     puntuacion: {
+        default: 0,
         type: Number
     },
     contadorCalificaciones: {
@@ -99,21 +100,20 @@ const comercioSchema = new mongoose_1.Schema({
         },
     },
     estadisticas: {
-        visitas: {
-            type: Number,
-            trim: true,
-        },
         ventas: {
             type: Number,
             trim: true,
+            default: 0
         },
         deuda: {
             type: Number,
             trim: true,
+            default: 0
         },
         ingresosTotales: {
             type: Number,
             trim: true,
+            default: 0
         },
         ultimoPago: {
             type: Date,

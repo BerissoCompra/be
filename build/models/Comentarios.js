@@ -18,7 +18,7 @@ const ComentarioSchema = new mongoose_1.Schema({
         required: false,
     },
     puntuacion: {
-        type: String,
+        type: Number,
         trim: true,
         required: false,
     },

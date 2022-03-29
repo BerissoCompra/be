@@ -7,36 +7,52 @@ const PedidoSchema = new mongoose_1.Schema({
         trim: true,
         required: true,
     },
+    comercio: {},
+    idPedido: {
+        type: String,
+    },
     clienteId: {
         type: String,
         trim: true,
         required: true,
     },
-    nombreUsuario: {
-        type: String,
-        trim: true,
-        required: true,
-    },
     productos: [],
-    direccion: {
-        type: String,
-        trim: true,
-        required: true,
-    },
-    numDep: {
-        type: String,
-        trim: true,
-        required: true,
-    },
-    direccionInfo: {
-        type: String,
-        trim: true,
-        required: true,
-    },
-    telefono: {
-        type: String,
-        trim: true,
-        required: true,
+    configuracion: {
+        direccion: {
+            type: String,
+            trim: true,
+            required: true,
+        },
+        numDep: {
+            type: String,
+            trim: true,
+            required: true,
+        },
+        direccionInfo: {
+            type: String,
+            trim: true,
+            required: true,
+        },
+        telefono: {
+            type: String,
+            trim: true,
+            required: true,
+        },
+        pagaCon: {
+            type: Number,
+        },
+        retira: {
+            type: Boolean,
+        },
+        envio: {
+            type: Boolean,
+        },
+        pagoEfectivo: {
+            type: Boolean,
+        },
+        pagoDigital: {
+            type: Boolean,
+        },
     },
     estado: {
         type: Number,
@@ -46,24 +62,6 @@ const PedidoSchema = new mongoose_1.Schema({
     },
     items: {
         type: Number,
-    },
-    pagaCon: {
-        type: Number,
-    },
-    retira: {
-        type: Boolean,
-    },
-    envio: {
-        type: Boolean,
-    },
-    pagoEfectivo: {
-        type: Boolean,
-    },
-    pagoDigital: {
-        type: Boolean,
-    },
-    idPedido: {
-        type: String,
     },
     motivoRechazo: {
         type: String,

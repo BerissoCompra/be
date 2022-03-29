@@ -23,10 +23,14 @@ class ComerciosRoutes {
         this.router.put('/:id/desactivar', this.verifyToken ,comercioController.desactivarComercio);
         this.router.put('/calificar/:id',comercioController.calificarComercio);
         this.router.get('/verificar/:id', this.verifyToken ,comercioController.verificarComercio);
+        this.router.get('/cierrecaja/:id', this.verifyToken ,comercioController.obtenerCierreDeCaja);
+        this.router.get('/cierrecaja/:id/cerrar', this.verifyToken ,comercioController.cerrarCaja);
+        this.router.get('/cierrecaja/:id/ticket', this.verifyToken ,comercioController.cerrarCajaTicket);
         this.router.put('/:id/abrir', this.verifyToken ,comercioController.abrirComercio);
         this.router.put('/:id/cerrar', this.verifyToken ,comercioController.cerrarComercio);
+        this.router.get('/comentarios/:id', this.verifyToken ,comercioController.obtenerComentariosByComercioId);
     }
-
+    
     verifyToken(req: any, res: any, next: any){
         if(!req.headers.authorization) return res.status(401).json('No Autorizado');
         const token = req.headers.authorization.substring(7);

@@ -205,6 +205,11 @@ class UsersController{
         }
     }
 
+    public async updateCliente(req: Request, res: Response){
+        const usuarioActualizado = await Cliente.findByIdAndUpdate(req.params.id, req.body)
+        .then(()=> {return res.status(200).json({msg: 'Actualizado'})})
+        .catch(err=> {console.log(err); return res.status(404).json({msg: 'No se pudo actualizar'})})
+    } 
     
     public async verificarCodigo(req: Request, res: Response){
         const {email, codigo} = req.body;

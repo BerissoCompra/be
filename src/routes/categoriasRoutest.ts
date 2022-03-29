@@ -11,10 +11,18 @@ class CategoriaRoutes {
 
     config(){
         this.router.post('/', categoriasController.crearCategoria);
-        this.router.put('/:id', categoriasController.updateCategoria);
+        this.router.put('/:id', [this.test] ,categoriasController.updateCategoria);
         this.router.get('/', categoriasController.getCategorias);
         this.router.delete('/:id', categoriasController.deleteCategoria);
         this.router.get('/:tipo', categoriasController.getCategoriasPorTipo);
+    }
+
+    test(req: any, res: any){
+        console.log("Id incorrecto")
+        if(req.params.id == 0){
+            console.log("Id incorrecto")
+            throw new Error('El id es incorrecto')
+        }
     }
 }
 

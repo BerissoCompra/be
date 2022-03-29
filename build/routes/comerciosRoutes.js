@@ -28,8 +28,12 @@ class ComerciosRoutes {
         this.router.put('/:id/desactivar', this.verifyToken, comercioController_1.comercioController.desactivarComercio);
         this.router.put('/calificar/:id', comercioController_1.comercioController.calificarComercio);
         this.router.get('/verificar/:id', this.verifyToken, comercioController_1.comercioController.verificarComercio);
+        this.router.get('/cierrecaja/:id', this.verifyToken, comercioController_1.comercioController.obtenerCierreDeCaja);
+        this.router.get('/cierrecaja/:id/cerrar', this.verifyToken, comercioController_1.comercioController.cerrarCaja);
+        this.router.get('/cierrecaja/:id/ticket', this.verifyToken, comercioController_1.comercioController.cerrarCajaTicket);
         this.router.put('/:id/abrir', this.verifyToken, comercioController_1.comercioController.abrirComercio);
         this.router.put('/:id/cerrar', this.verifyToken, comercioController_1.comercioController.cerrarComercio);
+        this.router.get('/comentarios/:id', this.verifyToken, comercioController_1.comercioController.obtenerComentariosByComercioId);
     }
     verifyToken(req, res, next) {
         if (!req.headers.authorization)

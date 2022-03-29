@@ -17,8 +17,9 @@ class PedidosRoutes {
         this.router.get('/:id', this.verifyToken, pedidosController_1.pedidosController.obtenerPedidosId);
         this.router.get('/cliente/:id', this.verifyToken, pedidosController_1.pedidosController.obtenerPedidosCliente);
         this.router.get('/comercio/:id/:estado', this.verifyToken, pedidosController_1.pedidosController.obtenerPedidosComercios);
-        this.router.post('/:id', this.verifyToken, pedidosController_1.pedidosController.crearPedido);
-        this.router.put('/:id', this.verifyToken, pedidosController_1.pedidosController.actualizarPedido);
+        this.router.post('/crear', this.verifyToken, pedidosController_1.pedidosController.crearPedido);
+        this.router.put('/:id', this.verifyToken, pedidosController_1.pedidosController.cambiarEstadoPedido);
+        this.router.get('/:id/ticket', this.verifyToken, pedidosController_1.pedidosController.obtenerTicket);
         this.router.delete('/:id', this.verifyToken, pedidosController_1.pedidosController.eliminarPedido);
     }
     verifyToken(req, res, next) {

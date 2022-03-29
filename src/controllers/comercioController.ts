@@ -7,11 +7,20 @@ import fs from 'fs-extra';
 import path from 'path';
 import Comercio from '../models/Comercio';
 import Producto from '../models/Producto';
+import Comentarios from '../models/Comentarios';
+import Cliente from '../models/Cliente';
+import Pedido from '../models/Pedido';
+import pdf, { CreateOptions } from "html-pdf";
+import { crearHtmlCierreCaja } from '../libs/generatePdf';
+
 
 class ComercioController{
 
     public async crearComercio(req: Request, res: Response){
-        const comercio = new ComercioModel(req.body);
+        const comercio = new ComercioModel({
+            ...req.body,
+            imagen: 'https://www.uifrommars.com/wp-content/uploads/2018/08/crear-paleta-colores-diseno-ui.jpg'
+        });
         const comercioGuardado = await comercio.save()
         .catch((err: any)=> {
             console.log(err);
@@ -190,34 +199,74 @@ class ComercioController{
         })      
     }
 
+    public async obtenerComentariosByComercioId(req: any, res: Response){
+        const {id} = req.params;
+        const comentarios = await Comentarios.find({comercioId: id}).limit(10).sort(({createdAt: -1}));
+        let resultadoComentarios: any[] = [];
+
+        if(comentarios.length > 0){
+            
+            await Promise.all (
+                comentarios.map(async(comentario)=>{
+                    const usuario = await Cliente.findById(comentario.usuarioId);
+                    if(usuario){
+                        resultadoComentarios.push({
+                            comentario: comentario.comentario,
+                            puntuacion: comentario.puntuacion,
+                            usuario: usuario.nombre
+                        })
+                    }
+                })
+            )
+
+            
+        }
+
+        return res.status(200).json(resultadoComentarios)
+
+    }
+
     public async calificarComercio(req: any, res: Response){
         const {id} = req.params;
+        const {calificacion, comentario, usuarioId} = req.body;
 
-        const {calificacion} = req.body;
         let punt;
         let cont;
         let estrellas;
 
-        console.log(calificacion + " "+ id)
+        if(!id) return res.status(404).json({msg: 'ID Inválido'})
 
-        await ComercioModel.findOne({_id: id}).then(async(comercio: any)=>{
-            console.log(comercio)
-            punt = comercio.puntuacion + calificacion
-            cont = comercio.contadorCalificaciones ? comercio.contadorCalificaciones + 1 : 1
-            estrellas = punt / cont;
-            await ComercioModel.updateOne({_id: id}, {
-                puntuacion: punt,
-                contadorCalificaciones: cont,
-                estrellas,
-            })
-            .then((com)=>{
-                return res.status(200).json(com);
-            })
-            .catch((err)=>{
-                return res.status(404).json({msg: 'No se pudo actualizar'});
-            })
+        const comercio = await ComercioModel.findById(id);
 
-        })  
+        if(!comercio) return res.status(404).json({msg: 'No se encontro el comercio'})
+
+        punt = comercio.puntuacion + calificacion
+        cont = comercio.contadorCalificaciones ? comercio.contadorCalificaciones + 1 : 1
+        estrellas = punt / cont;
+
+        const comercioActualizado = await ComercioModel.findByIdAndUpdate(id, {
+            puntuacion: punt,
+            contadorCalificaciones: cont,
+            estrellas,
+        })
+
+        if(comercioActualizado){
+            if(comentario){
+                const comment = new Comentarios({
+                    comercioId: id,
+                    usuarioId,
+                    comentario,
+                    puntuacion: calificacion
+                })
+                const saveComentario = await comment.save()
+            }
+
+            return res.status(200).json(comercioActualizado);
+        
+        }
+        else{
+            return res.status(404).json({msg: 'No se pudo calificar el comercio'})
+        }
          
     }
 
@@ -270,12 +319,15 @@ class ComercioController{
 
             const deuda = comercio.estadisticas.deuda ? comercio.estadisticas.deuda : 0;
             const date = new Date();
+            const mes = date.getMonth() + 1;
+            const year = date.getFullYear();
+            const dateFinal = new Date(year, mes, 10)
 
             await ComercioModel.updateOne({_id: id}, {estadisticas: {
                 ...comercio.estadisticas,
-                deuda: (deuda - total),
+                deuda: 0,
                 ultimoPago: new Date(),
-                proximoPago: date.setDate(date.getDate() + 7)
+                proximoPago: dateFinal
             }})
             .then()
             .catch((err: any)=> {
@@ -348,6 +400,113 @@ class ComercioController{
         }
         else{
             return res.status(404).json({msg: 'No se encontro el comercio'});
+        }
+    }
+
+    public async cerrarCaja(req: any, res: Response){
+        const {id} = req.params;
+        if(!id) return res.status(404).json({msg: 'No se ha podido realizar el cierre'})
+        const pedidos = await Pedido.find({comercioId: id});
+        await Promise.all(
+            pedidos.map(async(pedido)=>{
+                if(pedido._id){
+                    await Pedido.findByIdAndDelete(pedido._id);
+                } 
+            }) 
+        )
+
+        return res.status(200).json({msg: 'Cierre de caja realizado correctamente'})
+    }
+
+    public async obtenerCierreDeCaja(req: any, res: Response){
+        const {id} = req.params;
+        const pedidos = await Pedido.find({comercioId: id});
+
+        if(pedidos){
+            const cantidadPedidos: number = pedidos.length;
+            let totalIngresoDiario: number = 0;
+            let pedidosDelDia: any[] = [];
+            await Promise.all(
+                pedidos.map(async(pedido)=>{
+                    if(pedido._id){
+                        //await Pedido.findByIdAndDelete(pedido._id);
+                        const usuario = await Cliente.findById(pedido.clienteId)
+                        totalIngresoDiario = totalIngresoDiario + pedido.total;
+                        pedidosDelDia.push({
+                            pedidoId: pedido.idPedido,
+                            pagoEfectivo: pedido.configuracion.pagoEfectivo,
+                            pagoDigital: pedido.configuracion.pagoDigital,
+                            items: pedido.items,
+                            total: pedido.total,
+                            fecha: pedido.createdAt,
+                            nombreCliente: usuario.nombre,
+                        })
+                    } 
+                }) 
+            )
+
+            return res.status(200).json({
+                cantidadPedidos,
+                totalIngresoDiario,
+                pedidosDelDia
+            })
+        }
+        else{
+            return res.status(404).json({
+                msg: 'Error al cerrar la caja',
+            })
+        }
+    }
+
+    public async cerrarCajaTicket(req: any, res: Response){
+        const {id} = req.params;
+        console.log(id)
+        const pedidos = await Pedido.find({comercioId: id});
+
+        if(pedidos){
+            const cantidadPedidos: number = pedidos.length;
+            let totalIngresoDiario: number = 0;
+            let pedidosDelDia: any[] = [];
+            await Promise.all(
+                pedidos.map(async(pedido)=>{
+                    if(pedido._id){
+                        //await Pedido.findByIdAndDelete(pedido._id);
+                        const usuario = await Cliente.findById(pedido.clienteId)
+                        totalIngresoDiario = totalIngresoDiario + pedido.total;
+                        pedidosDelDia.push({
+                            pedidoId: pedido.idPedido,
+                            pagoEfectivo: pedido.configuracion.pagoEfectivo,
+                            pagoDigital: pedido.configuracion.pagoDigital,
+                            items: pedido.items,
+                            total: pedido.total,
+                            fecha: pedido.createdAt,
+                            nombreCliente: usuario.nombre,
+                        })
+                    } 
+                }) 
+            ) 
+
+            const options: CreateOptions = {
+                "format": "A4",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+                "orientation": "portrait", // portrait or landscape
+            }
+
+            const content = crearHtmlCierreCaja(totalIngresoDiario,cantidadPedidos,pedidosDelDia);
+
+            pdf.create(content, options).toStream((err: any, stream) => {
+                if (err) {
+                    console.log("Err")
+                    return res.end(err.stack)
+                }
+                res.setHeader('Content-type', 'application/pdf')
+                return stream.pipe(res)
+               
+            })
+        }
+        else{
+            return res.status(404).json({
+                msg: 'Error al cerrar la caja',
+            })
         }
     }
 }
