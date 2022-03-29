@@ -15,7 +15,7 @@ import path from 'path';
 import imagesRoutes from './routes/imagesRoutes';
 import publicidadRoutes from './routes/publicidadRoutes';
 import { createWorker } from 'tesseract.js';
-import categoriasRoutest from './routes/categoriasRoutest';
+import categoriasRoutest from './routes/categoriasRoutes';
 
 // const worker = createWorker({
 //   logger: m => console.log(m)

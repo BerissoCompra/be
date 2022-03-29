@@ -17,7 +17,7 @@ const ComentarioSchema = new Schema({
         required: false,
     },   
     puntuacion: {
-        type: String,
+        type: Number,
         trim: true,
         required: false,
     },      
