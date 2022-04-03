@@ -72,10 +72,7 @@ const comercioSchema = new Schema({
     costoEnvio: {
         type: Number
     }, 
-    horarios: {
-        type: String,
-        trim: true,
-    }, 
+    horarios: [],  
     abierto: {
         type: Boolean,
         default: false,

@@ -14,7 +14,7 @@ class PedidosController{
     public async crearPedido(req: Request, res: Response){
         const {comercioId, productos, clienteId, configuracion} = req.body;
         const usuario = await Cliente.findById(clienteId);
-        const comercio = await Cliente.findById(comercioId);
+        const comercio = await Comercio.findById(comercioId);
 
         const codigoEntrega = Math.round(Math.random() * 10000);
         const codigoPedido = `CA-${Math.round(Math.random() * 10000)}`;
@@ -24,6 +24,10 @@ class PedidosController{
         productos.map((prod: any)=>{
             totalPedido += prod.precioTotal;
         })
+
+        if(comercio?.tipoEnvio === 'pago' && comercio?.costoEnvio > 0 && configuracion?.envio && !configuracion?.retira){
+            totalPedido += comercio.costoEnvio; 
+        }
 
         const pedido = new Pedido({
             comercioId,

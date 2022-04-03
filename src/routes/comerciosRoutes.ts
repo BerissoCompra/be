@@ -2,6 +2,8 @@ import {NextFunction, Router} from 'express';
 import { comercioController} from '../controllers/comercioController';
 import keys from '../keys';
 import jwt from 'jsonwebtoken';
+import multer from '../libs/multer';
+
 class ComerciosRoutes {
     public router: Router = Router();
     constructor(){
@@ -10,12 +12,15 @@ class ComerciosRoutes {
     config():void{
         //TODO Ver proximamente el middleware
         this.router.get('/', comercioController.obtenerComercios);
+        this.router.get('/search/:consulta', comercioController.searchComercio);
         this.router.post('/new', comercioController.crearComercio);
         this.router.get('/obtener', this.verifyToken ,comercioController.obtenerComerciosByUserId);
         this.router.get('/filtrar/:filtro', this.verifyToken,comercioController.obtenerComerciosByFiltro);
         this.router.get('/:id', this.verifyToken,comercioController.obtenerComerciosById);
         this.router.get('/:id/usuario', this.verifyToken,comercioController.obtenerResponsableById);
-        this.router.put('/:id', this.verifyToken ,comercioController.actualizarComercio);
+        this.router.put('/:id', [this.verifyToken, multer.single('imagen')] ,comercioController.actualizarComercio);
+        this.router.put('/:id/horarios', [this.verifyToken] ,comercioController.actualizarHorarioComercio);
+        this.router.put('/:id/cuenta', [this.verifyToken] ,comercioController.actualizarCuentaComercio);
         this.router.delete('/:id', this.verifyToken ,comercioController.eliminarComercio);
         this.router.put('/:id/activar', this.verifyToken ,comercioController.activarComercio);
         this.router.put('/:id/registrarventa', this.verifyToken ,comercioController.registrarVenta);

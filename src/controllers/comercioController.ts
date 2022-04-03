@@ -136,27 +136,100 @@ class ComercioController{
         
     }
 
+    public async searchComercio(req: any, res: Response){
+        const {consulta} = req.params;
+        console.log(consulta)
+        await Comercio.createIndexes([{"nombre": 1}]);
+        if(consulta){
+            const comercio = await Comercio.find({$text:{$search:consulta}, activado: true})
+            return res.status(200).json(comercio);
+        }
+        else{
+            return res.status(404).json({msg: 'No se econtro el comercio'});
+        }   
+    }
+
     public async actualizarComercio(req: any, res: Response){
         const {id} = req.params;
+        const {file, body} = req;
+        const {estadisticas, cuenta, ...rest} = body;
         const comercio = await ComercioModel.findById(id)
-        .then()
-        .catch((err: any)=> {
-            console.log(err);
-            return res.status(404).json({msg: 'Error al actualizar producto.'});
-        });
+        if(file){
+            const fileName = file.filename;
+            if(comercio?.imagenPath){
+                await fs.unlink(path.resolve(comercio.imagenPath))
+                .then(async()=>{
+                    await ComercioModel.findByIdAndUpdate(id, 
+                        {
+                            ...rest,
+                            imagenPath: file.path,
+                            imagen: `http://192.168.0.229:3000/uploads/${fileName}`
+                        }).then((ok)=>{
+                        return res.status(200).json({msg: 'Comercio Actualizado'}); 
+                    })
+                    .catch((err)=>{
+                        return res.status(404).json({msg: 'No se pudo actualizar'});
+                    })
+                })
+                .catch(async(err)=> {
+                    await ComercioModel.findByIdAndUpdate(id, 
+                        {
+                            ...rest,
+                            imagenPath: file.path,
+                            imagen: `http://192.168.0.229:3000/uploads/${fileName}`
+                        }).then((ok)=>{
+                        return res.status(200).json({msg: 'Comercio Actualizado'}); 
+                    })
+                    .catch((err)=>{
+                        return res.status(404).json({msg: 'No se pudo actualizar'});
+                    })
+                })
+            }
+            else{
+                await ComercioModel.findByIdAndUpdate(id, 
+                    {
+                        ...rest,
+                        imagenPath: file.path,
+                        imagen: `http://192.168.0.229:3000/uploads/${fileName}`
+                    }).then((ok)=>{
+                    return res.status(200).json({msg: 'Comercio Actualizado'}); 
+                })
+                .catch((err)=>{
+                    return res.status(404).json({msg: 'No se pudo actualizar'});
+                })
+            }
+        }
+        else{
+            console.log("No trae file")
+            await ComercioModel.findByIdAndUpdate(id, rest).then((ok)=>{
+                return res.status(200).json({msg: 'Comercio Actualizado'}); 
+            })
+            .catch((err)=>{
+                return res.status(404).json({msg: 'No se pudo actualizar'});
+            }) 
+        }
+    }
 
-        if(comercio.imagenPath && comercio.imagenPath != req.body.imagenPath){
-            await fs.unlink(path.resolve(comercio.imagenPath))
-            .then(()=>{console.log("Imagen anterior eliminada")})
-            .catch((err)=> console.log(err))
-        }  
-        
-        await ComercioModel.findByIdAndUpdate(id, req.body).then((ok)=>{
-            return res.status(200).json(ok); 
+    public async actualizarHorarioComercio(req: any, res: Response){
+        const {id} = req.params;
+        const {body} = req;
+        await ComercioModel.findByIdAndUpdate(id, body).then((ok)=>{
+            return res.status(200).json({msg: 'Comercio Actualizado'}); 
         })
         .catch((err)=>{
             return res.status(404).json({msg: 'No se pudo actualizar'});
-        })      
+        }) 
+    }
+
+    public async actualizarCuentaComercio(req: any, res: Response){
+        const {id} = req.params;
+        const {body} = req;
+        await ComercioModel.findByIdAndUpdate(id, body).then((ok)=>{
+            return res.status(200).json({msg: 'Comercio Actualizado'}); 
+        })
+        .catch((err)=>{
+            return res.status(404).json({msg: 'No se pudo actualizar'});
+        }) 
     }
 
     public async activarComercio(req: any, res: Response){
@@ -242,7 +315,7 @@ class ComercioController{
 
         punt = comercio.puntuacion + calificacion
         cont = comercio.contadorCalificaciones ? comercio.contadorCalificaciones + 1 : 1
-        estrellas = punt / cont;
+        estrellas = Math.round(punt / cont);
 
         const comercioActualizado = await ComercioModel.findByIdAndUpdate(id, {
             puntuacion: punt,
@@ -429,7 +502,6 @@ class ComercioController{
             await Promise.all(
                 pedidos.map(async(pedido)=>{
                     if(pedido._id){
-                        //await Pedido.findByIdAndDelete(pedido._id);
                         const usuario = await Cliente.findById(pedido.clienteId)
                         totalIngresoDiario = totalIngresoDiario + pedido.total;
                         pedidosDelDia.push({
