@@ -12,6 +12,7 @@ import Cliente from '../models/Cliente';
 import Pedido from '../models/Pedido';
 import pdf, { CreateOptions } from "html-pdf";
 import { crearHtmlCierreCaja } from '../libs/generatePdf';
+import { Config } from '../config/api.config';
 
 
 class ComercioController{
@@ -163,7 +164,7 @@ class ComercioController{
                         {
                             ...rest,
                             imagenPath: file.path,
-                            imagen: `http://192.168.0.229:3000/uploads/${fileName}`
+                            imagen: `${Config.baseUrl}/uploads/${fileName}`
                         }).then((ok)=>{
                         return res.status(200).json({msg: 'Comercio Actualizado'}); 
                     })
@@ -176,7 +177,7 @@ class ComercioController{
                         {
                             ...rest,
                             imagenPath: file.path,
-                            imagen: `http://192.168.0.229:3000/uploads/${fileName}`
+                            imagen: `${Config.baseUrl}/uploads/${fileName}`
                         }).then((ok)=>{
                         return res.status(200).json({msg: 'Comercio Actualizado'}); 
                     })

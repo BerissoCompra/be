@@ -5,6 +5,7 @@ import { TipoClientePublicidad } from '../models/enum/tipo-publicidad.enum';
 import Publicidad, { PublicidadInterface } from '../models/Publicidad';
 import fs from 'fs-extra';
 import path from 'path';
+import { Config } from '../config/api.config';
 
 class PublicidadController{
      
@@ -88,7 +89,7 @@ class PublicidadController{
         const fileName = file.filename;
         const publicidad = await new Publicidad({ 
             ...body,
-            imagen: `http://192.168.0.229:3000/uploads/${fileName}`,
+            imagen: `${Config.baseUrl}/uploads/${fileName}`,
             imagenPath: file.path, 
         });
 
