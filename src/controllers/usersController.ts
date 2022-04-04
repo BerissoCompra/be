@@ -27,6 +27,18 @@ class UsersController{
             return await res.status(500).json({msg: 'El usuario y/o contraseña son incorrectos'})
         }
     }
+
+    public async verificarUsuario(req: any, res: Response){
+        const {uid} = req.data;
+        const cliente = await Cliente.findById(uid);
+
+        if(cliente){
+            return res.status(200).json({valido: true})
+        }
+        else{
+            return res.status(200).json({valido: false})
+        }
+    }
   
     public async crearUsuario(req: Request, res: Response){
         const {email} = req.body;
