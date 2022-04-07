@@ -2,6 +2,7 @@ import {Router} from 'express';
 import { productoController} from '../controllers/productoController';
 import keys from '../keys';
 import jwt from 'jsonwebtoken';
+import { verifyToken } from '../middlewares/auth';
 
 class ProductosRoutes {
     public router: Router = Router();
@@ -9,28 +10,15 @@ class ProductosRoutes {
         this.config();
     }
     config():void{
-        //this.router.get('/:id', this.verifyToken, productoController.obtenerProductos);
+        //this.router.get('/:id', [verifyToken], productoController.obtenerProductos);
         this.router.get('/productos/:id', productoController.obtenerProductosPorComercio);
-        this.router.delete('/productos/:id', this.verifyToken, productoController.elimiarProducto);
-        this.router.put('/productos/:id', this.verifyToken ,productoController.actualizarProducto);
-        this.router.put('/productos/:id/activar', this.verifyToken ,productoController.activarProducto);
-        this.router.put('/productos/:id/desactivar', this.verifyToken ,productoController.desactivarProducto);
-        this.router.post('/productos/nuevo', this.verifyToken, productoController.nuevoProducto);
+        this.router.delete('/productos/:id', [verifyToken], productoController.elimiarProducto);
+        this.router.put('/productos/:id', [verifyToken] ,productoController.actualizarProducto);
+        this.router.put('/productos/:id/activar', [verifyToken] ,productoController.activarProducto);
+        this.router.put('/productos/:id/desactivar', [verifyToken] ,productoController.desactivarProducto);
+        this.router.post('/productos/nuevo', [verifyToken], productoController.nuevoProducto);
     }
 
-    verifyToken(req: any, res: any, next: any){
-        if(!req.headers.authorization) return res.status(401).json('No Autorizado');
-        const token = req.headers.authorization.substring(7);
-       
-        if(token!==''){
-            const content = jwt.verify(token, keys.seckey)
-            req.data = content;
-            next();
-        }
-        else{
-            return res.status(401).json('No Token');
-        }
-    }   
 }
 
 

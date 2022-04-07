@@ -64,13 +64,13 @@ io.on('connection', (socket) => {
 
     socket.on('cliente', (res)=>{
         const data = res;
-        socket.broadcast.to(comercioId as string).emit('cliente', data);
+        socket.emit('cliente', data);
         console.log("EMMIT --------CLIENTE------------- ", comercioId)
     })
 
     socket.on('comercio', (res)=>{
         const data = res;
-        socket.broadcast.to(comercioId as string).emit('comercio', data);
+        socket.emit('comercio', data);
         console.log("EMMIT --------COMERCIO------------- ", comercioId)
     })
 });

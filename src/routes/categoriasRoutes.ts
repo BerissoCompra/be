@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { categoriasController } from "../controllers/categoriasController";
+import { verifyToken } from "../middlewares/auth";
 
 
 class CategoriaRoutes {
@@ -10,20 +11,13 @@ class CategoriaRoutes {
     }
 
     config(){
-        this.router.post('/', categoriasController.crearCategoria);
-        this.router.put('/:id', [this.test] ,categoriasController.updateCategoria);
-        this.router.get('/', categoriasController.getCategorias);
-        this.router.delete('/:id', categoriasController.deleteCategoria);
-        this.router.get('/:tipo', categoriasController.getCategoriasPorTipo);
+        this.router.post('/', [verifyToken] ,categoriasController.crearCategoria);
+        this.router.put('/:id', [verifyToken] ,categoriasController.updateCategoria);
+        this.router.get('/', [verifyToken] ,categoriasController.getCategorias);
+        this.router.delete('/:id', verifyToken ,categoriasController.deleteCategoria);
+        this.router.get('/:tipo', [verifyToken] ,categoriasController.getCategoriasPorTipo);
     }
 
-    test(req: any, res: any){
-        console.log("Id incorrecto")
-        if(req.params.id == 0){
-            console.log("Id incorrecto")
-            throw new Error('El id es incorrecto')
-        }
-    }
 }
 
 const categoriaRoutes = new CategoriaRoutes();
