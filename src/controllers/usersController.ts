@@ -6,77 +6,126 @@ import Cliente from '../models/Cliente';
 import Comercio from '../models/Comercio';
 import CodigosRecuperacion from '../models/CodigosRecuperacion';
 import { sendEmail } from '../config/mailer';
+import { Config } from '../config/api.config';
 
 class UsersController{
 
     public async iniciarSesion(req: Request, res: Response){
-        const {email, password} = req.body;
-        const usuarioExiste = await Usuario.find({email: email, password: password})
-        if(usuarioExiste.length > 0){
-            let activado: boolean = await usuarioExiste[0].emailActivado;
-            let  data = JSON.stringify({uid: usuarioExiste[0]._id});
-            if(usuarioExiste[0]?.rol){
-                data = JSON.stringify({uid: usuarioExiste[0]._id, rol: usuarioExiste[0]?.rol});
+        try {
+            const {email} = req.body;
+            const usuarioExiste = await Usuario.findOne({email: email})
+            if(!usuarioExiste) return await res.status(404).json({msg: 'El usuario no existe'})
+
+            const matchPassword = await Usuario.comparePassword(
+                req.body.password,
+                usuarioExiste.password
+            );
+
+            if (!matchPassword) return res.status(401).json({
+                token: null,
+                message: "El usuario y/o contraseña son incorrectos",
+            });
+
+            let activado: boolean = await usuarioExiste.emailActivado;
+            let  data = JSON.stringify({uid: usuarioExiste._id});
+
+            if(usuarioExiste.rol){
+                data = JSON.stringify({uid: usuarioExiste._id, rol: usuarioExiste?.rol});
                 activado = true;
             }
+
             const token = jwt.sign(data, keys.seckey)
-            console.log(activado)
+
             return await res.status(200).json({token: token, activado});
-        }
-        else{
-            return await res.status(500).json({msg: 'El usuario y/o contraseña son incorrectos'})
+
+        } catch (error) {
+            console.log(error);
+            return await res.status(404).json({msg: 'Error al autenticar'});
         }
     }
 
-    public async verificarUsuario(req: any, res: Response){
-        const {uid} = req.data;
-        const cliente = await Cliente.findById(uid);
+    public async iniciarSesionCliente(req: Request, res: Response){
+        try {
+            const {email, password} = req.body;
+            const usuarioExiste = await Cliente.findOne({email: email})
 
-        if(cliente){
-            return res.status(200).json({valido: true})
-        }
-        else{
-            return res.status(200).json({valido: false})
+            if(!usuarioExiste)  return res.status(404).json({msg: 'El usuario y/o contraseña son incorrectos'})
+
+            const matchPassword = await Cliente.comparePassword(
+                password,
+                usuarioExiste.password
+            );
+
+            if (!matchPassword) return res.status(401).json({
+                token: null,
+                message: "El usuario y/o contraseña son incorrectos",
+            });
+
+            const data = JSON.stringify({uid: usuarioExiste._id});
+            const token = jwt.sign(data, keys.seckey)
+
+            return res.status(200).json({token, finalizoTutorial: usuarioExiste.finalizoTutorial});
+
+        } catch (error) {
+            return await res.status(404).json({msg: 'Error al autenticar'});
         }
     }
   
     public async crearUsuario(req: Request, res: Response){
-        const {email} = req.body;
-        const usuarioExiste = await Usuario.find({email: email.toLowerCase()})
+        try {
+            const {email} = req.body;
+            const usuarioExiste = await Usuario.find({email: email.toLowerCase()})
 
-        if(usuarioExiste.length > 0){
-            return res.status(200).json({msg: 'El email ingresado ya se encuentra registrado.'});
+            if(usuarioExiste.length > 0){
+                return res.status(200).json({msg: 'El email ingresado ya se encuentra registrado.'});
+            }
+            else{ 
+                const nuevoUsuario = new Usuario(req.body);
+                nuevoUsuario.password = await Usuario.encryptPassword(nuevoUsuario.password);
+                const usuarioRegistrado = await nuevoUsuario.save();
+
+                if(usuarioRegistrado){
+                    const urlActivacion = `${Config.baseUrl}/accountverify/${usuarioRegistrado._id}`
+                    const html = `<div style="">
+                    <h2 style="text-align: center; color: #333;">Verificación de Cuenta</h2>
+                    <p style="text-align: center; color: blueviolet;">Haz click en el siguiente enlace para verificar su cuenta</p>
+                    <a href="${urlActivacion}" style="text-align: center; background-color: blueviolet; color: #fff; padding: 10px; text-decoration: none; margin: 0 auto;">VERIFICAR</a>
+                    </div>`;
+                    await sendEmail('Activar Cuenta | Responsable de Comercio', email, 'Servicio de activación', html)
+                    return res.status(200).json(
+                        {
+                            _id: usuarioRegistrado._id, 
+                            nombre: usuarioRegistrado.nombre,
+                        });
+                }
+                else{
+                    return res.status(404).json({msg: 'No se pudo registrar.'});
+                }
         }
-        else{ 
-            const nuevoUsuario = new Usuario(req.body);
-            const usuarioRegistrado = await nuevoUsuario.save() 
+        } catch (error) {
+            console.error(error);
+            return res.status(404).json({msg: 'No se pudo registrar.'});
+        }
+    }
+
+    public async crearUsuarioCliente(req: Request, res: Response){
+        try {
+            const {email, terminos} = req.body;
+            const usuarioExiste = await Cliente.findOne({email: email.toLowerCase()})
+            if(usuarioExiste) return res.status(404).json({msg: 'El email ingresado ya se encuentra registrado.'});
+            if(!terminos) return res.status(404).json({msg: 'Debe aceptar los Términos y Condiciones.'});
+
+            const nuevoUsuario = new Cliente(req.body);
+            nuevoUsuario.password = await Cliente.encryptPassword(nuevoUsuario.password);
+            const usuarioRegistrado = await nuevoUsuario.save()
             if(usuarioRegistrado){
-                const urlActivacion = `http://localhost:4200/accountverify/${usuarioRegistrado._id}`
-                const html = `<div style="">
-                <h2 style="text-align: center; color: #333;">Verificación de Cuenta</h2>
-                <p style="text-align: center; color: blueviolet;">Haz click en el siguiente enlace para verificar su cuenta</p>
-                <a href="${urlActivacion}" style="text-align: center; background-color: blueviolet; color: #fff; padding: 10px; text-decoration: none; margin: 0 auto;">VERIFICAR</a>
-                </div>`;
-                await sendEmail('Activar Cuenta | Responsable de Comercio', email, 'Servicio de activación', html)
                 return res.status(200).json({_id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre});
             }
             else{
                 return res.status(404).json({msg: 'No se pudo registrar.'});
             }
-        }
-    }
-
-    public async iniciarSesionCliente(req: Request, res: Response){
-        const {email, password} = req.body;
-        const usuarioExiste = await Cliente.find({email: email, password: password})
-
-        if(usuarioExiste.length > 0){
-            const data = JSON.stringify({uid: usuarioExiste[0]._id});
-            const token = jwt.sign(data, keys.seckey)
-            return res.status(200).json({token, finalizoTutorial: usuarioExiste[0].finalizoTutorial});
-        }
-        else{
-            return res.status(404).json({msg: 'El usuario y/o contraseña son incorrectos'})
+        } catch (error) {
+            return res.status(404).json({msg: 'No se pudo registrar.'});
         }
     }
 
@@ -104,53 +153,49 @@ class UsersController{
 
         
     }
-  
-    public async crearUsuarioCliente(req: Request, res: Response){
-        const {email, terminos} = req.body;
-        const usuarioExiste = await Cliente.find({email: email.toLowerCase()})
-        if(usuarioExiste.length > 0){
-            console.log('El email ingresado ya se encuentra registrado.')
-            return res.status(404).json({msg: 'El email ingresado ya se encuentra registrado.'});
-        }
-        else if(!terminos){
-            console.log('Debe aceptar los Términos y Condiciones.')
-            return res.status(404).json({msg: 'Debe aceptar los Términos y Condiciones.'});
+
+    public async verificarUsuario(req: any, res: Response){
+        const {uid} = req.data;
+        const cliente = await Cliente.findById(uid);
+
+        if(cliente){
+            return res.status(200).json({valido: true})
         }
         else{
-            const nuevoUsuario = new Cliente(req.body);
-            const usuarioRegistrado = await nuevoUsuario.save()
-            if(usuarioRegistrado){
-                return res.status(200).json({_id: usuarioRegistrado._id, nombre: usuarioRegistrado.nombre});
-            }
-            else{
-                return res.status(404).json({msg: 'No se pudo registrar.'});
-            }
+            return res.status(200).json({valido: false})
         }
     }
-
+  
     public async getClienteById(req: Request | any, res: Response){
-        const {uid} = req.data;
-        const cliente = await Cliente.findById(uid)
-        if(cliente){
-            const {password, ...rest} = cliente._doc;
-            return res.status(200).json(rest);
-        }
-        else{
-            return res.status(404).json({ok: 'No se encontro el comercio'});
+        try {
+            const {uid} = req.data;
+            const cliente = await Cliente.findById(uid)
+            if(cliente){
+                const {password, ...rest} = cliente._doc;
+                return res.status(200).json(rest);
+            }
+            else{
+                return res.status(404).json({ok: 'No se encontro el usuario'});
+            }
+        } catch (error) {
+            return res.status(404).json({ok: 'No se encontro el usuario'});
         }
     }
 
     public async addFavorito(req: Request, res: Response){
-        const {id} = req.params;
-        const {comercioId} = req.body;
+        try {
+            const {id} = req.params;
+            const {comercioId} = req.body;
 
-        let nuevosFavoritos: any[] = [];
-        let respuesta: boolean = false;
+            let nuevosFavoritos: any[] = [];
+            let respuesta: boolean = false;
 
-        const cliente = await Cliente.findById(id);
+            const cliente = await Cliente.findById(id);
 
-        if(cliente){
+            if(!cliente) return res.status(404).json({msg: 'No se encontro el cliente'});
+
             const existe = cliente.favoritos.filter((fav: string)=> fav === comercioId);
+
             if(existe.length > 0){
                 nuevosFavoritos = cliente.favoritos.filter((fav: string)=> fav != comercioId);
                 respuesta = false;
@@ -162,8 +207,8 @@ class UsersController{
 
             await Cliente.updateOne({_id: id}, {favoritos: nuevosFavoritos})
             return res.status(200).json({msg: respuesta});
-        }
-        else{
+
+        } catch (error) {
             return res.status(404).json({msg: 'No se encontro el cliente'});
         }
 

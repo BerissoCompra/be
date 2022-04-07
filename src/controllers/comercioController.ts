@@ -18,21 +18,26 @@ import { Config } from '../config/api.config';
 class ComercioController{
 
     public async crearComercio(req: Request, res: Response){
-        const comercio = new ComercioModel({
-            ...req.body,
-            imagen: 'https://www.uifrommars.com/wp-content/uploads/2018/08/crear-paleta-colores-diseno-ui.jpg'
-        });
-        const comercioGuardado = await comercio.save()
-        .catch((err: any)=> {
-            console.log(err);
-            return res.status(404).json({msg: 'El comercio no se pudo crear correctamente.'});
-        });
-
-        if(comercioGuardado){
-            return res.status(200).json({msg: 'Comercio creado.'});
-        }
-        else{
-            return res.status(500).json({msg: 'El comercio no se pudo crear correctamente.'});
+        try {
+            const comercio = new ComercioModel({
+                ...req.body,
+                imagen: 'https://www.uifrommars.com/wp-content/uploads/2018/08/crear-paleta-colores-diseno-ui.jpg'
+            });
+            const comercioGuardado = await comercio.save()
+            .catch((err: any)=> {
+                console.log(err);
+                return res.status(404).json({msg: 'El comercio no se pudo crear correctamente.'});
+            });
+    
+            if(comercioGuardado){
+                return res.status(200).json({msg: 'Comercio creado.'});
+            }
+            else{
+                return res.status(400).json({msg: 'El comercio no se pudo crear correctamente.'});
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(400).json({msg: 'El comercio no se pudo crear correctamente.'});
         }
     }
 
