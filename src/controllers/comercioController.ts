@@ -143,16 +143,19 @@ class ComercioController{
     }
 
     public async searchComercio(req: any, res: Response){
-        const {consulta} = req.params;
-        console.log(consulta)
-        await Comercio.createIndexes([{"nombre": 1}]);
-        if(consulta){
-            const comercio = await Comercio.find({$text:{$search:consulta}, activado: true})
-            return res.status(200).json(comercio);
-        }
-        else{
+        try {
+            const {consulta} = req.params;
+            if(consulta){
+                const comercio = await Comercio.find({nombre: new RegExp(consulta, 'i'), activado: true})
+                return res.status(200).json(comercio);
+            }
+            else{
+                return res.status(404).json({msg: 'No se econtro el comercio'});
+            } 
+        } catch (error) {
+            console.log(error)
             return res.status(404).json({msg: 'No se econtro el comercio'});
-        }   
+        }  
     }
 
     public async actualizarComercio(req: any, res: Response){
