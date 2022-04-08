@@ -6,7 +6,11 @@ import Cliente from '../models/Cliente';
 
 export const verifyToken = async(req: any, res: any, next: any) =>{
     let token = req.headers["x-access-token"];
-    if (!token) return res.status(403).json({ message: "No token provided" });
+    let ip = req.headers['x-forwarded-for'] ||
+    req.socket.remoteAddress ||
+    null;
+    console.log(ip)
+    if (!token) return res.status(403).json({ message: `Unauthorized! err.101` });
 
     try {
         //const token = req.headers.authorization.substring(7);
@@ -22,7 +26,7 @@ export const verifyToken = async(req: any, res: any, next: any) =>{
         else{
             return res.status(404).json({ message: "No user found" });
         }
-        
+
     } catch (error) {
         return res.status(401).json({ message: "Unauthorized!" });
     }

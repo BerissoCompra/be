@@ -23,7 +23,7 @@ class UsersController{
 
             if (!matchPassword) return res.status(401).json({
                 token: null,
-                message: "El usuario y/o contraseña son incorrectos",
+                msg: "El usuario y/o contraseña son incorrectos",
             });
 
             let activado: boolean = await usuarioExiste.emailActivado;
@@ -58,7 +58,7 @@ class UsersController{
 
             if (!matchPassword) return res.status(401).json({
                 token: null,
-                message: "El usuario y/o contraseña son incorrectos",
+                msg: "El usuario y/o contraseña son incorrectos",
             });
 
             const data = JSON.stringify({uid: usuarioExiste._id});
