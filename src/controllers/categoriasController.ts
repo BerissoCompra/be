@@ -35,7 +35,7 @@ class CategoriasController {
       if (categorias.includes(tipo)) {
         return res.status(200).json(categorias);
       } else {
-        return res.status(200).json('La categoría no existe');
+        return res.status(200).json([]);
       }
     } catch (error) {
       return res

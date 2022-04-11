@@ -1,23 +1,29 @@
-import { Router } from "express";
-import { categoriasController } from "../controllers/categoriasController";
-import { verifyToken } from "../middlewares/auth";
-
+import { Router } from 'express';
+import { categoriasController } from '../controllers/categoriasController';
+import { verifyToken } from '../middlewares/auth';
 
 class CategoriaRoutes {
-    router = Router();
+  router = Router();
 
-    constructor(){
-        this.config(); 
-    }
+  constructor() {
+    this.config();
+  }
 
-    config(){
-        this.router.post('/', [verifyToken] ,categoriasController.crearCategoria);
-        this.router.put('/:id', [verifyToken] ,categoriasController.updateCategoria);
-        this.router.get('/', [verifyToken] ,categoriasController.getCategorias);
-        this.router.delete('/:id', verifyToken ,categoriasController.deleteCategoria);
-        this.router.get('/:tipo', [verifyToken] ,categoriasController.getCategoriasPorTipo);
-    }
+  config() {
+    //POST
+    this.router.post('/', categoriasController.crearCategoria);
 
+    //GET
+    this.router.get('/', categoriasController.getCategorias);
+    this.router.get('/:id', categoriasController.getCategoriasById);
+    this.router.get('/:tipo', categoriasController.getCategoriasPorTipo);
+
+    //PUT
+    this.router.put('/:id', categoriasController.updateCategoria);
+
+    //DELETE
+    this.router.delete('/:id', categoriasController.deleteCategoria);
+  }
 }
 
 const categoriaRoutes = new CategoriaRoutes();
