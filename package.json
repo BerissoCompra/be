@@ -7,9 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "",
     "buildev": "tsc -w",
-    "dev": "nodemon build/index.js",
+    "dev": "node ./setVariables.cjs && nodemon build/index.js",
     "e2e": "ng e2e",
-    "nuevo-modulo": "node ./test.js"
+    "deploy": "node ./setVariables.cjs && tsc"
   },
   "keywords": [],
   "author": "",

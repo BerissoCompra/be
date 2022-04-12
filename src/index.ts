@@ -10,27 +10,11 @@ import usersRoutes from './routes/usersRoutes';
 import productosRoutes from './routes/productosRoutes';
 import {connectDb} from './database';
 import pedidosRoutes from './routes/pedidosRoutes';
-import { sendEmail } from './config/mailer';
 import path from 'path';
 import imagesRoutes from './routes/imagesRoutes';
 import publicidadRoutes from './routes/publicidadRoutes';
-import { createWorker } from 'tesseract.js';
 import categoriasRoutest from './routes/categoriasRoutes';
 
-// const worker = createWorker({
-//   logger: m => console.log(m)
-// });
-
-// const reconocerImagen = async () => {
-//   await worker.load();
-//   await worker.loadLanguage('spa');
-//   await worker.initialize('spa');
-//   const { data: { text } } = await worker.recognize('https://www.elciudadanoweb.com/wp-content/uploads/2020/11/dni.jpg'); 
-//   console.log(text);
-//   await worker.terminate();
-// };
-
-// reconocerImagen();
 
 const app =  express();
 const server = http.createServer(app);
@@ -58,9 +42,8 @@ app.use('/uploads', express.static(path.resolve('uploads')));
 
 io.on('connection', (socket) => {
     const {comercioId} = socket.handshake.query;    
-    socket.join(comercioId as string);
 
-    console.log('Connected ', comercioId)
+    socket.join(comercioId as string);
 
     socket.on('cliente', (res)=>{
         const data = res;

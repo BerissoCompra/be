@@ -16,7 +16,7 @@ class CategoriaRoutes {
     //GET
     this.router.get('/', categoriasController.getCategorias);
     this.router.get('/:id', categoriasController.getCategoriasById);
-    this.router.get('/:tipo', categoriasController.getCategoriasPorTipo);
+    this.router.get('/filtro/:tipo', categoriasController.getCategoriasPorTipo);
 
     //PUT
     this.router.put('/:id', categoriasController.updateCategoria);

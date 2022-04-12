@@ -29,15 +29,12 @@ class CategoriasController {
   }
 
   public async getCategoriasPorTipo(req: Request, res: Response) {
-    const { tipo } = req.params;
     try {
+      const { tipo } = req.params;
       const categorias = await CategoriaModel.find({ tipo });
-      if (categorias.includes(tipo)) {
-        return res.status(200).json(categorias);
-      } else {
-        return res.status(200).json([]);
-      }
-    } catch (error) {
+      return res.status(200).json(categorias);
+    } 
+    catch (error) {
       return res
         .status(500)
         .json({ msg: 'Error al obtener las categorias', error });

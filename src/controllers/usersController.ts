@@ -40,7 +40,7 @@ class UsersController{
 
         } catch (error) {
             console.log(error);
-            return await res.status(404).json({msg: 'Error al autenticar'});
+            return await res.status(500).json({msg: 'Error al autenticar'});
         }
     }
 
@@ -67,7 +67,7 @@ class UsersController{
             return res.status(200).json({token, finalizoTutorial: usuarioExiste.finalizoTutorial});
 
         } catch (error) {
-            return await res.status(404).json({msg: 'Error al autenticar'});
+            return await res.status(500).json({msg: 'Error al autenticar'});
         }
     }
   
@@ -85,8 +85,8 @@ class UsersController{
                 const usuarioRegistrado = await nuevoUsuario.save();
 
                 if(usuarioRegistrado){
-                    const urlActivacion = `${Config.baseUrl}/accountverify/${usuarioRegistrado._id}`
-                    const html = `<div style="">
+                    const urlActivacion = `${Config.frontUrl}/accountverify/${usuarioRegistrado._id}`
+                    const html = `<div style="text-align: center;">
                     <h2 style="text-align: center; color: #333;">Verificación de Cuenta</h2>
                     <p style="text-align: center; color: blueviolet;">Haz click en el siguiente enlace para verificar su cuenta</p>
                     <a href="${urlActivacion}" style="text-align: center; background-color: blueviolet; color: #fff; padding: 10px; text-decoration: none; margin: 0 auto;">VERIFICAR</a>
@@ -104,7 +104,7 @@ class UsersController{
         }
         } catch (error) {
             console.error(error);
-            return res.status(404).json({msg: 'No se pudo registrar.'});
+            return res.status(500).json({msg: 'No se pudo registrar.'});
         }
     }
 
@@ -125,7 +125,7 @@ class UsersController{
                 return res.status(404).json({msg: 'No se pudo registrar.'});
             }
         } catch (error) {
-            return res.status(404).json({msg: 'No se pudo registrar.'});
+            return res.status(500).json({msg: 'No se pudo registrar.'});
         }
     }
 
@@ -178,7 +178,7 @@ class UsersController{
                 return res.status(404).json({ok: 'No se encontro el usuario'});
             }
         } catch (error) {
-            return res.status(404).json({ok: 'No se encontro el usuario'});
+            return res.status(500).json({ok: 'No se encontro el usuario'});
         }
     }
 
@@ -209,7 +209,7 @@ class UsersController{
             return res.status(200).json({msg: respuesta});
 
         } catch (error) {
-            return res.status(404).json({msg: 'No se encontro el cliente'});
+            return res.status(500).json({msg: 'No se encontro el cliente'});
         }
 
     }
