@@ -39,6 +39,11 @@ class UsersRoutes {
     this.router.put('/verificarCodigo', usersController.verificarCodigo);
     this.router.put('/actualizarpassword', usersController.RecuperarPassword);
     this.router.put(
+      '/cliente/tutorial/finalizado',
+      [verifyToken],
+      usersController.finalizarTutorial,
+    );
+    this.router.put(
       '/cliente/:id',
       [verifyToken],
       usersController.updateCliente,

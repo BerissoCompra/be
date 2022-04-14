@@ -18,8 +18,9 @@ import categoriasRoutest from './routes/categoriasRoutes';
 
 const app =  express();
 const server = http.createServer(app);
-const io = new socketIo.Server(server);
+const io = new socketIo.Server(server, { cors: { origin: '*' } });
 
+//Db config
 connectDb();
 
 //Config
@@ -40,23 +41,47 @@ app.use('/api/publicidad',publicidadRoutes);
 app.use('/api/categorias',categoriasRoutest);
 app.use('/uploads', express.static(path.resolve('uploads')));
 
+let userConnected = new Map();
+
 io.on('connection', (socket) => {
+
     const {comercioId} = socket.handshake.query;    
-
     socket.join(comercioId as string);
+    addUser(comercioId, socket.id);
 
+    
     socket.on('cliente', (res)=>{
-        const data = res;
-        socket.emit('cliente', data);
+        socket.broadcast.emit('cliente', res);
         console.log("EMMIT --------CLIENTE------------- ", comercioId)
     })
 
     socket.on('comercio', (res)=>{
-        const data = res;
-        socket.emit('comercio', data);
+        socket.broadcast.emit('comercio', res);
         console.log("EMMIT --------COMERCIO------------- ", comercioId)
     })
+
+
+    socket.on('disconnect', (reason) => {
+        removeUser(comercioId, socket.id);
+    })
 });
+
+const addUser = (comercioId: any, id: any) => {
+    if (!userConnected.has(comercioId)) {
+        userConnected.set(comercioId, new Set(id));
+    } else {
+        userConnected.get(comercioId).add(id);
+    }
+}
+
+const removeUser = (comercioId: any, id: any) => {
+    if (userConnected.has(comercioId)) {
+        let userIds = userConnected.get(comercioId);
+        if (userIds.size == 0) {
+            userConnected.delete(comercioId);
+        }
+    }
+}
   
 
 server.listen(app.get('port'), ()=>{

@@ -112,10 +112,12 @@ class UsersController{
         try {
             const {email, terminos} = req.body;
             const usuarioExiste = await Cliente.findOne({email: email.toLowerCase()})
+            console.log(req.body)
             if(usuarioExiste) return res.status(404).json({msg: 'El email ingresado ya se encuentra registrado.'});
             if(!terminos) return res.status(404).json({msg: 'Debe aceptar los Términos y Condiciones.'});
 
             const nuevoUsuario = new Cliente(req.body);
+            console.log(req.body)
             nuevoUsuario.password = await Cliente.encryptPassword(nuevoUsuario.password);
             const usuarioRegistrado = await nuevoUsuario.save()
             if(usuarioRegistrado){
@@ -159,10 +161,26 @@ class UsersController{
         const cliente = await Cliente.findById(uid);
 
         if(cliente){
-            return res.status(200).json({valido: true})
+            return res.status(200).json({valido: true, tutorial: cliente.finalizoTutorial})
         }
         else{
-            return res.status(200).json({valido: false})
+            return res.status(200).json({valido: false, tutorial: cliente.finalizoTutorial})
+        }
+    }
+
+    public async finalizarTutorial(req: any, res: Response){
+        try {
+            const {uid} = req.data;
+            const actualizarCliente = await Cliente.findByIdAndUpdate(uid, {finalizoTutorial: true});
+            if(actualizarCliente){
+                return res.status(200).json({msg: 'Tutorial finalizado'})
+            }
+            else{
+                return res.status(404).json({msg: 'Error al finalizar tutorial'})
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({msg: 'Error al finalizar tutorial'})
         }
     }
   
@@ -243,23 +261,48 @@ class UsersController{
     }
 
     public async EnviarCodigoVerificacion(req: Request, res: Response): Promise<Response<any>>{
-        const {email} = req.body;
-        const cliente = await Usuario.findOne({email});
+        const {email, rol} = req.body;
 
-        if(cliente){
-            const codigoRecuperacion = {
-                email,
-                codigo: `AC-${Math.round(Math.random() * 10000)}`
+        if(rol === 'comercio'){
+            const usuario = await Usuario.findOne({email});
+
+            if(usuario){
+                const codigoRecuperacion = {
+                    email,
+                    codigo: `AC-${Math.round(Math.random() * 10000)}`
+                }
+                const html = `<h2>Aplicación ciudad | CODIGO:</h2><p>${codigoRecuperacion.codigo}</p>`;
+                const crearCodigo = new CodigosRecuperacion(codigoRecuperacion)
+                await crearCodigo.save();
+                await sendEmail('Recuperación de contraseña', email, 'Servicio de recuperación', html)
+                return res.status(200).send({msg: true});
             }
-            const html = `<h2>Aplicación ciudad | CODIGO:</h2><p>${codigoRecuperacion.codigo}</p>`;
-            const crearCodigo = new CodigosRecuperacion(codigoRecuperacion)
-            await crearCodigo.save();
-            await sendEmail('Recuperación de contraseña', email, 'Servicio de recuperación', html)
-            return res.status(200).send({msg: true});
+            else{
+                return res.status(404).json({msg: 'El usuario no existe'})
+            }
         }
-        else{
-            return res.status(404).json({msg: 'El usuario no existe'})
+
+        if(rol === 'cliente'){
+            const usuario = await Cliente.findOne({email});
+            console.log(usuario)
+            if(usuario){
+                const codigoRecuperacion = {
+                    email,
+                    codigo: `AC-${Math.round(Math.random() * 10000)}`
+                }
+                const html = `<h2>Aplicación ciudad | CODIGO:</h2><p>${codigoRecuperacion.codigo}</p>`;
+                const crearCodigo = new CodigosRecuperacion(codigoRecuperacion)
+                await crearCodigo.save();
+                await sendEmail('Recuperación de contraseña', email, 'Servicio de recuperación', html)
+                return res.status(200).send({msg: true});
+            }
+            else{
+                return res.status(404).json({msg: 'El usuario no existe'})
+            }
         }
+         
+
+        
     }
 
     public async updateCliente(req: Request, res: Response){
@@ -281,18 +324,34 @@ class UsersController{
     }
 
     public async RecuperarPassword(req: Request, res: Response): Promise<Response<any>>{
-        const {codigo, password} = req.body;
+        const {codigo, password, rol} = req.body;
         const codigoRecuperacion = await CodigosRecuperacion.findOne({codigo});
 
         if(codigoRecuperacion){
-            const usuario = await Usuario.findOne({email: codigoRecuperacion.email});
-            if(usuario){
-                await Usuario.updateOne({_id: usuario._id}, {password});
-                await CodigosRecuperacion.deleteOne({codigo, email: codigoRecuperacion.email})
-                return res.status(200).json({msg: 'Contraseña actualizada.'});
+            if(rol === 'comercio'){
+                const usuario = await Usuario.findOne({email: codigoRecuperacion.email});
+                const nuevaPassword = await Usuario.encryptPassword(password);
+                if(usuario){
+                    await Usuario.updateOne({_id: usuario._id}, {password: nuevaPassword});
+                    await CodigosRecuperacion.deleteOne({codigo, email: codigoRecuperacion.email})
+                    return res.status(200).json({msg: 'Contraseña actualizada.'});
+                }
+                else{
+                    return res.status(404).json({msg: 'Error.'});
+                }
             }
-            else{
-                return res.status(404).json({msg: 'Error.'});
+
+            if(rol === 'cliente'){
+                const usuario = await Cliente.findOne({email: codigoRecuperacion.email});
+                const nuevaPassword = await Cliente.encryptPassword(password);
+                if(usuario){
+                    await Cliente.updateOne({_id: usuario._id}, {password: nuevaPassword});
+                    await CodigosRecuperacion.deleteOne({codigo, email: codigoRecuperacion.email})
+                    return res.status(200).json({msg: 'Contraseña actualizada.'});
+                }
+                else{
+                    return res.status(404).json({msg: 'Error.'});
+                }
             }
         }
         else{
