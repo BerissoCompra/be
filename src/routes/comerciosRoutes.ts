@@ -26,6 +26,11 @@ class ComerciosRoutes {
       comercioController.obtenerComerciosByFiltro,
     );
     this.router.get(
+      '/filtrar/categoria/:categoria',
+      [verifyToken],
+      comercioController.obtenerComerciosByCategoria,
+    );
+    this.router.get(
       '/:id',
       [verifyToken],
       comercioController.obtenerComerciosById,

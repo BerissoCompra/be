@@ -8,6 +8,7 @@ import { SeguimientoEnum } from '../models/enum/tipo-estado.enum';
 import Cliente from '../models/Cliente';
 import pdf, { CreateOptions } from 'html-pdf';
 import { crearHtmlPedido } from '../libs/generatePdf';
+import { ensureSymlinkSync } from 'fs-extra';
 
 class PedidosController {
   public async crearPedido(req: Request, res: Response) {
@@ -42,9 +43,6 @@ class PedidosController {
         productos,
         configuracion: {
           ...configuracion,
-          direccion: usuario?.direccion,
-          numDep: usuario?.numDep,
-          direccionInfo: usuario?.direccionInfo,
           telefono: usuario?.telefono,
         },
         estado: SeguimientoEnum.ESPERANDO_APROBACION,
@@ -114,8 +112,20 @@ class PedidosController {
     try {
       const { id, estado } = req.params;
       const pedidos = await Pedido.find({ comercioId: id, estado: estado });
-      if (pedidos) {
-        return res.status(200).json(pedidos);
+      let pedidosResponse: any[] = [];
+      await Promise.all(
+        pedidos.map(async(pedido)=>{
+          const usuarioCliente = await Cliente.findById(pedido.clienteId);
+          const {password, ...rest} = usuarioCliente._doc;
+          pedidosResponse.push({
+            ...pedido._doc,
+            cliente: rest
+          })
+        })
+      )
+
+      if (pedidosResponse) {
+        return res.status(200).json(pedidosResponse);
       } else {
         return res.status(404).json({ ok: 'No se encontraron pedidos' });
       }
@@ -193,6 +203,22 @@ class PedidosController {
         if (pedidoActualizado) {
           return res.status(200).json({ _id: pedidoActualizado._id });
         }
+      }
+    } catch (error) {
+      console.error(error);
+      return res
+        .status(500)
+        .json({ err: 'El pedido no se pudo actualizar correctamente.' });
+    }
+  }
+
+  public async rechazarPedido(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const {motivo} = req.body;
+      const pedido = await Pedido.findByIdAndUpdate(id, {estado: SeguimientoEnum.RECHAZADO, motivoRechazo: motivo});
+      if (pedido) {
+        return res.status(200).json({ _id: pedido._id });
       }
     } catch (error) {
       console.error(error);

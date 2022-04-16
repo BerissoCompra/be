@@ -104,7 +104,7 @@ class ComercioController{
                 console.log(err);
                 return res.status(404).json({msg: 'Error al obtener comercios.'});
             });
-            console.log(comercios)
+
             return res.status(200).json(comercios);
         }
         else if(filtro === TipoFiltroEnum.DESTACADOS){
@@ -126,6 +126,20 @@ class ComercioController{
             });
             
             return res.status(200).json(comercios);
+        }
+       
+    }
+
+    public async obtenerComerciosByCategoria(req: any, res: Response){
+        const {categoria} = req.params;
+                
+        try {
+            const comercios = await ComercioModel.find({categoria, activado: true}).sort(({estrellas: -1}))
+            return res.status(200).json(comercios)
+            
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({msg: 'Error al obtener comercios.'});
         }
        
     }

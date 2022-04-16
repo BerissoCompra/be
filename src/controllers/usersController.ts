@@ -271,7 +271,11 @@ class UsersController{
                     email,
                     codigo: `AC-${Math.round(Math.random() * 10000)}`
                 }
-                const html = `<h2>Aplicación ciudad | CODIGO:</h2><p>${codigoRecuperacion.codigo}</p>`;
+                const html = `
+                <h2>Ciudad APP | Código de recuperación:</h2>
+                <p>${codigoRecuperacion.codigo}</p>
+                <p>Si tú no has solicitado la recuperación, te pedimos que ignores este correo</p>
+                `;
                 const crearCodigo = new CodigosRecuperacion(codigoRecuperacion)
                 await crearCodigo.save();
                 await sendEmail('Recuperación de contraseña', email, 'Servicio de recuperación', html)
@@ -288,9 +292,13 @@ class UsersController{
             if(usuario){
                 const codigoRecuperacion = {
                     email,
-                    codigo: `AC-${Math.round(Math.random() * 10000)}`
+                    codigo: `CA${Math.round(Math.random() * 10000)}`
                 }
-                const html = `<h2>Aplicación ciudad | CODIGO:</h2><p>${codigoRecuperacion.codigo}</p>`;
+                const html = `
+                <h2>Ciudad APP | Código de recuperación:</h2>
+                <p style="text-align: center; color: blueviolet; font-size: 30px">${codigoRecuperacion.codigo}</p>
+                <p text-align: center; color: #ccc; font-size: 14px">Si tú no has solicitado la recuperación, te pedimos que ignores este correo</p>
+                `;
                 const crearCodigo = new CodigosRecuperacion(codigoRecuperacion)
                 await crearCodigo.save();
                 await sendEmail('Recuperación de contraseña', email, 'Servicio de recuperación', html)

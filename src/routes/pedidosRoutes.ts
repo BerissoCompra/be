@@ -37,6 +37,11 @@ class PedidosRoutes {
       [verifyToken],
       pedidosController.cambiarEstadoPedido,
     );
+    this.router.put(
+      '/:id/rechazar',
+      [verifyToken],
+      pedidosController.rechazarPedido,
+    );
 
     //DELETE
     this.router.delete('/:id', [verifyToken], pedidosController.eliminarPedido);

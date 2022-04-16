@@ -6,11 +6,10 @@ import Cliente from '../models/Cliente';
 
 export const verifyToken = async(req: any, res: any, next: any) =>{
     let token = req.headers["x-access-token"];
-    let ip = req.headers['x-forwarded-for'] ||
+    let ip: string = req.headers['x-forwarded-for'] ||
     req.socket.remoteAddress ||
     null;
-    console.log(ip)
-    if (!token) return res.status(403).json({ message: `Unauthorized! err.101` });
+    if (!token) return res.status(403).json({ message: `${ip?.split('::ffff:')[1]} Unauthorized! err.101 NTF` });
 
     try {
         //const token = req.headers.authorization.substring(7);

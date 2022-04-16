@@ -17,6 +17,10 @@ class ProductosRoutes {
       '/productos/:id',
       productoController.obtenerProductosPorComercio,
     );
+    this.router.get(
+      '/productos/descuentos/obtener',
+      productoController.obtenerProductosEnDescuento,
+    );
 
     //POST
     this.router.post(

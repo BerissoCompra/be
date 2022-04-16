@@ -112,6 +112,21 @@ class ProductoController {
       return res.status(404).json({ msg: 'Error al obtener productos.' });
     }
   }
+
+  public async obtenerProductosEnDescuento(
+    req: Request,
+    res: Response,
+  ): Promise<any> {
+    try {
+      const { id } = req.params;
+      const productos = await ProductoModel.find({ descuento: {$gt: 1} });
+      return res.status(200).json(productos);
+      
+    } catch (error: any) {
+      console.log(error);
+      return res.status(404).json({ msg: 'Error al obtener productos.' });
+    }
+  }
 }
 
 export const productoController = new ProductoController();
