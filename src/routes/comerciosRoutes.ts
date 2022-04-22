@@ -86,11 +86,7 @@ class ComerciosRoutes {
       comercioController.actualizarCuentaComercio,
     );
     //TODO Agregar Verify Token cuando haya roles !
-    this.router.put(
-      '/:id/activar',
-      [],
-      comercioController.activarComercio,
-    );
+    this.router.put('/:id/activar', [], comercioController.activarComercio);
     this.router.put(
       '/:id/registrarventa',
       [verifyToken],
