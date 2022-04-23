@@ -21,12 +21,16 @@ class ProductosRoutes {
       '/productos/descuentos/obtener',
       productoController.obtenerProductosEnDescuento,
     );
+    this.router.get(
+      '/productos/descuentos/obtener/:categoria',
+      productoController.obtenerProductosEnDescuentoByCategoria,
+    );
 
     //POST
     this.router.post(
       '/productos/nuevo',
       [verifyToken],
-      productoController.nuevoProducto,
+      productoController.nuevoProducto, 
     );
 
     //PUT

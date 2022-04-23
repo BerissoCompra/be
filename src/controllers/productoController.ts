@@ -135,6 +135,21 @@ class ProductoController {
       return res.status(404).json({ msg: 'Error al obtener productos.' });
     }
   }
+
+  public async obtenerProductosEnDescuentoByCategoria(
+    req: Request,
+    res: Response,
+  ): Promise<any> {
+    try {
+      const { id, categoria } = req.params;
+      const productos = await ProductoModel.find({categoria: categoria, descuento: {$gt: 1} });
+      return res.status(200).json(productos);
+      
+    } catch (error: any) {
+      console.log(error);
+      return res.status(404).json({ msg: 'Error al obtener productos.' });
+    }
+  }
 }
 
 export const productoController = new ProductoController();
