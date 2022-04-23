@@ -7,16 +7,15 @@ import path from 'path';
 class ProductoController {
   public async nuevoProducto(req: Request, res: Response): Promise<any> {
     try {
-      const { producto } = req.body;
-      const prod = new ProductoModel(producto);
+      const prod = new ProductoModel(req.body);
       const productoGuaradado = await prod.save();
 
       if (productoGuaradado) {
-        return res.status(200).json({ msg: 'Producto creado.' });
+        return res.status(200).json({ msg: 'Producto creado.', id: productoGuaradado._id });
       }
     } catch (error: any) {
       console.error(error);
-      return res.status(404).json({ msg: 'Error al crear producto.' });
+      return res.status(500).json({ msg: 'Error al crear producto.' });
     }
   }
 
@@ -25,49 +24,58 @@ class ProductoController {
       const { id } = req.params;
       const producto = await ProductoModel.findByIdAndRemove(id);
       if (producto) {
-        await fs.unlink(path.resolve(producto.imagenPath)).then(() => {
-          return res.status(200).json({ msg: 'Producto eliminado.' });
-        });
+        return res.status(200).json({ msg: 'Producto eliminado.' });
       }
     } catch (error: any) {
       console.log(error);
-      return res.status(404).json({ msg: 'Error al eliminar producto.' });
+      return res.status(500).json({ msg: 'Error al eliminar producto.' });
     }
   }
 
   public async actualizarProducto(req: any, res: Response): Promise<any> {
-    const { id } = req.params;
-    const obtenerProducto = await ProductoModel.findById(id);
+    try {
+      const { id } = req.params;
+      const producto = await ProductoModel.findByIdAndUpdate(id, req.body);
 
-    //Elimino la imagen anterior
-    if (
-      obtenerProducto.imagenPath &&
-      obtenerProducto.imagenPath != req.body.imagenPath
-    ) {
-      await fs
-        .unlink(path.resolve(obtenerProducto.imagenPath))
-        .then(() => {
-          console.log('Img eliminada');
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-
-    const producto = await ProductoModel.findByIdAndUpdate(id, req.body).catch(
-      (err) => {
-        console.log(err);
+      if(producto){
+        return res.status(200).json({ msg: 'Producto actualizado.' });
+      }
+      else{
         return res.status(404).json({ msg: 'Error al actualizar.' });
-      },
-    );
+      }
 
-    if (producto) {
-      return res.status(200).json({ msg: 'Producto actualizado.' });
-    } else {
-      return res
-        .status(404)
-        .json({ msg: 'El producto no se puede actualizar.' });
+    } catch (error) {
+       return res.status(500).json({ msg: 'Error al actualizar.' });
     }
+    // //Elimino la imagen anterior
+    // if (
+    //   obtenerProducto.imagenPath &&
+    //   obtenerProducto.imagenPath != req.body.imagenPath
+    // ) {
+    //   await fs
+    //     .unlink(path.resolve(obtenerProducto.imagenPath))
+    //     .then(() => {
+    //       console.log('Img eliminada');
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    // }
+
+    // const producto = await ProductoModel.findByIdAndUpdate(id, req.body).catch(
+    //   (err) => {
+    //     console.log(err);
+    //     return res.status(404).json({ msg: 'Error al actualizar.' });
+    //   },
+    // );
+
+    // if (producto) {
+    //   return res.status(200).json({ msg: 'Producto actualizado.' });
+    // } else {
+    //   return res
+    //     .status(404)
+    //     .json({ msg: 'El producto no se puede actualizar.' });
+    // }
   }
 
   public async activarProducto(req: Request, res: Response): Promise<any> {

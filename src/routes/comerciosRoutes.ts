@@ -72,7 +72,7 @@ class ComerciosRoutes {
     //PUT
     this.router.put(
       '/:id',
-      [verifyToken, multer.single('imagen')],
+      [verifyToken],
       comercioController.actualizarComercio,
     );
     this.router.put(

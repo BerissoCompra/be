@@ -175,62 +175,71 @@ class ComercioController{
     public async actualizarComercio(req: any, res: Response){
         const {id} = req.params;
         const {file, body} = req;
-        const {estadisticas, cuenta, ...rest} = body;
-        const comercio = await ComercioModel.findById(id)
-        if(file){
-            const fileName = file.filename;
-            if(comercio?.imagenPath){
-                await fs.unlink(path.resolve(comercio.imagenPath))
-                .then(async()=>{
-                    await ComercioModel.findByIdAndUpdate(id, 
-                        {
-                            ...rest,
-                            imagenPath: file.path,
-                            imagen: `${Config.baseUrl}/uploads/${fileName}`
-                        }).then((ok)=>{
-                        return res.status(200).json({msg: 'Comercio Actualizado'}); 
-                    })
-                    .catch((err)=>{
-                        return res.status(404).json({msg: 'No se pudo actualizar'});
-                    })
-                })
-                .catch(async(err)=> {
-                    await ComercioModel.findByIdAndUpdate(id, 
-                        {
-                            ...rest,
-                            imagenPath: file.path,
-                            imagen: `${Config.baseUrl}/uploads/${fileName}`
-                        }).then((ok)=>{
-                        return res.status(200).json({msg: 'Comercio Actualizado'}); 
-                    })
-                    .catch((err)=>{
-                        return res.status(404).json({msg: 'No se pudo actualizar'});
-                    })
-                })
-            }
-            else{
-                await ComercioModel.findByIdAndUpdate(id, 
-                    {
-                        ...rest,
-                        imagenPath: file.path,
-                        imagen: `${Config.baseUrl}/uploads/${fileName}`
-                    }).then((ok)=>{
-                    return res.status(200).json({msg: 'Comercio Actualizado'}); 
-                })
-                .catch((err)=>{
-                    return res.status(404).json({msg: 'No se pudo actualizar'});
-                })
-            }
+        
+        if(!id) return res.status(404).json({msg: 'No se pudo actualizar id incorrecto'});
+        
+        const comercio = await ComercioModel.findByIdAndUpdate(id, body)
+
+        if(comercio){
+            return res.status(200).json({msg: 'Comercio Actualizado'});  
         }
         else{
-            console.log("No trae file")
-            await ComercioModel.findByIdAndUpdate(id, rest).then((ok)=>{
-                return res.status(200).json({msg: 'Comercio Actualizado'}); 
-            })
-            .catch((err)=>{
-                return res.status(404).json({msg: 'No se pudo actualizar'});
-            }) 
+            return res.status(404).json({msg: 'No se pudo actualizar'});
         }
+        // if(file){
+        //     const fileName = file.filename;
+        //     if(comercio?.imagenPath){
+        //         await fs.unlink(path.resolve(comercio.imagenPath))
+        //         .then(async()=>{
+        //             await ComercioModel.findByIdAndUpdate(id, 
+        //                 {
+        //                     ...rest,
+        //                     imagenPath: file.path,
+        //                     imagen: `${Config.baseUrl}/uploads/${fileName}`
+        //                 }).then((ok)=>{
+        //                 return res.status(200).json({msg: 'Comercio Actualizado'}); 
+        //             })
+        //             .catch((err)=>{
+        //                 return res.status(404).json({msg: 'No se pudo actualizar'});
+        //             })
+        //         })
+        //         .catch(async(err)=> {
+        //             await ComercioModel.findByIdAndUpdate(id, 
+        //                 {
+        //                     ...rest,
+        //                     imagenPath: file.path,
+        //                     imagen: `${Config.baseUrl}/uploads/${fileName}`
+        //                 }).then((ok)=>{
+        //                 return res.status(200).json({msg: 'Comercio Actualizado'}); 
+        //             })
+        //             .catch((err)=>{
+        //                 return res.status(404).json({msg: 'No se pudo actualizar'});
+        //             })
+        //         })
+        //     }
+        //     else{
+        //         await ComercioModel.findByIdAndUpdate(id, 
+        //             {
+        //                 ...rest,
+        //                 imagenPath: file.path,
+        //                 imagen: `${Config.baseUrl}/uploads/${fileName}`
+        //             }).then((ok)=>{
+        //             return res.status(200).json({msg: 'Comercio Actualizado'}); 
+        //         })
+        //         .catch((err)=>{
+        //             return res.status(404).json({msg: 'No se pudo actualizar'});
+        //         })
+        //     }
+        // }
+        // else{
+        //     console.log("No trae file")
+        //     await ComercioModel.findByIdAndUpdate(id, rest).then((ok)=>{
+        //         return res.status(200).json({msg: 'Comercio Actualizado'}); 
+        //     })
+        //     .catch((err)=>{
+        //         return res.status(404).json({msg: 'No se pudo actualizar'});
+        //     }) 
+        // }
     }
 
     public async actualizarHorarioComercio(req: any, res: Response){

@@ -22,7 +22,7 @@ const ProductoSchema = new Schema({
     },
     precio: {
         type: Number,
-        required: true,
+        required: false,
     },
     descuento: {
         type: Number,

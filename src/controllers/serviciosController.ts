@@ -9,8 +9,7 @@ class ServiciosController {
       const servicio = new ServicioModel(body);
       //   console.log(servicio);
       await servicio.save();
-
-      return res.status(200).json({ msg: 'Servicio creado correctamente' });
+      return res.status(200).json({ msg: 'Servicio creado correctamente', id: servicio._id });
     } catch (error) {
       return res.status(400).json({ msg: 'Hubo un error', error });
       console.error(error);
