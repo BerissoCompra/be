@@ -287,7 +287,6 @@ class PedidosController {
       var document = {
         html: html,
         data: {
-          users: users
         },
         path: "./output.pdf",
         type: "",
