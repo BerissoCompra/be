@@ -295,7 +295,7 @@ class PedidosController {
       pdf.create(document, options)
       .then((doc: any) => {
         res.setHeader('Content-type', 'application/pdf');
-        return res.sendFile(doc.filename);
+        return res.sendFile(doc.filename.toString());
       })
       .catch((error: any) => {
         console.log('Err');
