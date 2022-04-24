@@ -250,9 +250,9 @@ class PedidosController {
     const pedido = await Pedido.findById(id);
 
     try {
-      var html = fs.readFileSync(path.resolve('pedido.html'), "utf8");
+      const html = fs.readFileSync(path.resolve('pedido.html'), "utf8");
 
-      var options = {
+      const options = {
         format: "A3",
         orientation: "portrait",
         border: "10mm",
@@ -270,7 +270,7 @@ class PedidosController {
             }
         }
       };
-      var users = [
+      const users = [
         {
           name: "Shyam",
           age: "26",
@@ -284,7 +284,8 @@ class PedidosController {
           age: "26",
         },
       ];
-      var document = {
+
+      const document = {
         html: html,
         data: {
         },
@@ -299,11 +300,11 @@ class PedidosController {
       })
       .catch((error: any) => {
         console.log('Err');
-        return res.end(error);
+        return res.status(500).send(error);
       });
     } catch (error) {
       console.log('Err: ', error);
-      return res.end(error);
+      return res.status(500).send(error);
     }
 
     // const options: CreateOptions = {
