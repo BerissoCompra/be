@@ -299,7 +299,7 @@ class PedidosController {
         return res.sendFile(doc.filename.toString());
       })
       .catch((error: any) => {
-        console.log('Err');
+        console.log(error);
         return res.status(500).send(error);
       });
     } catch (error) {
