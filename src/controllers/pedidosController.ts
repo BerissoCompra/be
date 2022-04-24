@@ -6,9 +6,12 @@ import Pedido from '../models/Pedido';
 import Comercio from '../models/Comercio';
 import { SeguimientoEnum } from '../models/enum/tipo-estado.enum';
 import Cliente from '../models/Cliente';
-import pdf, { CreateOptions } from 'html-pdf';
+//import pdf, { CreateOptions } from 'html-pdf';
 import { crearHtmlPedido } from '../libs/generatePdf';
 import { ensureSymlinkSync } from 'fs-extra';
+import fs from 'fs-extra';
+import path from 'path';
+const pdf = require("pdf-creator-node");
 
 class PedidosController {
   public async crearPedido(req: Request, res: Response) {
@@ -246,23 +249,76 @@ class PedidosController {
     const { id } = req.params;
     const pedido = await Pedido.findById(id);
 
-    const options: CreateOptions = {
-      // allowed units: A3, A4, A5, Legal, Letter, Tabloid
-      orientation: 'portrait',
-      height: '600',
-      width: '512', // portrait or landscape
+    var html = fs.readFileSync(path.resolve('pedido.html'), "utf8");
+
+    var options = {
+      format: "A3",
+      orientation: "portrait",
+      border: "10mm",
+      header: {
+          height: "45mm",
+          contents: '<div style="text-align: center;">Author: Shyam Hajare</div>'
+      },
+      footer: {
+          height: "28mm",
+          contents: {
+              first: 'Cover page',
+              2: 'Second page', // Any page number is working. 1-based index
+              default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>', // fallback value
+              last: 'Last Page'
+          }
+      }
+    };
+    var users = [
+      {
+        name: "Shyam",
+        age: "26",
+      },
+      {
+        name: "Navjot",
+        age: "26",
+      },
+      { 
+        name: "Vitthal",
+        age: "26",
+      },
+    ];
+    var document = {
+      html: html,
+      data: {
+        users: users
+      },
+      path: "./output.pdf",
+      type: "",
     };
 
-    const content = crearHtmlPedido(pedido);
-
-    pdf.create(content, options).toStream((err: any, stream) => {
-      if (err) {
-        console.log('Err');
-        return res.end(err.stack);
-      }
+    pdf.create(document, options)
+    .then((doc: any) => {
       res.setHeader('Content-type', 'application/pdf');
-      return stream.pipe(res);
+      return res.sendFile(doc.filename);
+    })
+    .catch((error: any) => {
+      console.log('Err');
+      return res.end(error);
     });
+
+    // const options: CreateOptions = {
+    //   // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+    //   orientation: 'portrait',
+    //   height: '600',
+    //   width: '512', // portrait or landscape
+    // };
+
+    // const content = crearHtmlPedido(pedido);
+
+    // pdf.create(content, options).toStream((err: any, stream) => {
+    //   if (err) {
+    //     console.log('Err');
+    //     return res.end(err.stack);
+    //   }
+    //   res.setHeader('Content-type', 'application/pdf');
+    //   return stream.pipe(res);
+    // });
   }
 }
 

@@ -41,7 +41,7 @@ class UsersRoutes {
     this.router.put(
       '/cliente/tutorial/finalizado',
       [verifyToken],
-      usersController.finalizarTutorial,
+      usersController.finalizarTutorial, 
     );
     this.router.put(
       '/cliente/:id',
