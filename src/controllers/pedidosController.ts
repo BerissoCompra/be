@@ -249,58 +249,63 @@ class PedidosController {
     const { id } = req.params;
     const pedido = await Pedido.findById(id);
 
-    var html = fs.readFileSync(path.resolve('pedido.html'), "utf8");
+    try {
+      var html = fs.readFileSync(path.resolve('pedido.html'), "utf8");
 
-    var options = {
-      format: "A3",
-      orientation: "portrait",
-      border: "10mm",
-      header: {
-          height: "45mm",
-          contents: '<div style="text-align: center;">Author: Shyam Hajare</div>'
-      },
-      footer: {
-          height: "28mm",
-          contents: {
-              first: 'Cover page',
-              2: 'Second page', // Any page number is working. 1-based index
-              default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>', // fallback value
-              last: 'Last Page'
-          }
-      }
-    };
-    var users = [
-      {
-        name: "Shyam",
-        age: "26",
-      },
-      {
-        name: "Navjot",
-        age: "26",
-      },
-      { 
-        name: "Vitthal",
-        age: "26",
-      },
-    ];
-    var document = {
-      html: html,
-      data: {
-        users: users
-      },
-      path: "./output.pdf",
-      type: "",
-    };
-
-    pdf.create(document, options)
-    .then((doc: any) => {
-      res.setHeader('Content-type', 'application/pdf');
-      return res.sendFile(doc.filename);
-    })
-    .catch((error: any) => {
-      console.log('Err');
+      var options = {
+        format: "A3",
+        orientation: "portrait",
+        border: "10mm",
+        header: {
+            height: "45mm",
+            contents: '<div style="text-align: center;">Author: Shyam Hajare</div>'
+        },
+        footer: {
+            height: "28mm",
+            contents: {
+                first: 'Cover page',
+                2: 'Second page', // Any page number is working. 1-based index
+                default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>', // fallback value
+                last: 'Last Page'
+            }
+        }
+      };
+      var users = [
+        {
+          name: "Shyam",
+          age: "26",
+        },
+        {
+          name: "Navjot",
+          age: "26",
+        },
+        { 
+          name: "Vitthal",
+          age: "26",
+        },
+      ];
+      var document = {
+        html: html,
+        data: {
+          users: users
+        },
+        path: "./output.pdf",
+        type: "",
+      };
+  
+      pdf.create(document, options)
+      .then((doc: any) => {
+        res.setHeader('Content-type', 'application/pdf');
+        return res.sendFile(doc.filename);
+      })
+      .catch((error: any) => {
+        console.log('Err');
+        return res.end(error);
+      });
+    } catch (error) {
+      console.log('Err: ', error);
       return res.end(error);
-    });
+    }
 
     // const options: CreateOptions = {
     //   // allowed units: A3, A4, A5, Legal, Letter, Tabloid
