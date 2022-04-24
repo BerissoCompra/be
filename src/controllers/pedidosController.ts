@@ -7,11 +7,12 @@ import Comercio from '../models/Comercio';
 import { SeguimientoEnum } from '../models/enum/tipo-estado.enum';
 import Cliente from '../models/Cliente';
 //import pdf, { CreateOptions } from 'html-pdf';
-import { crearHtmlPedido } from '../libs/generatePdf';
-import { ensureSymlinkSync } from 'fs-extra';
+//import { crearHtmlPedido } from '../libs/generatePdf';
+//import { ensureSymlinkSync } from 'fs-extra';
 import fs from 'fs-extra';
 import path from 'path';
-const pdf = require("pdf-creator-node");
+import pdf from 'pdf-creator-node'
+//const pdf = require("pdf-creator-node");
 
 class PedidosController {
   public async crearPedido(req: Request, res: Response) {
