@@ -10,9 +10,9 @@ import Producto from '../models/Producto';
 import Comentarios from '../models/Comentarios';
 import Cliente from '../models/Cliente';
 import Pedido from '../models/Pedido';
-import pdf, { CreateOptions } from "html-pdf";
-import { crearHtmlCierreCaja } from '../libs/generatePdf';
-import { Config } from '../config/api.config';
+
+import {formatter } from '../libs/calculos';
+import pdf from 'pdf-creator-node'
 
 
 class ComercioController{
@@ -186,60 +186,6 @@ class ComercioController{
         else{
             return res.status(404).json({msg: 'No se pudo actualizar'});
         }
-        // if(file){
-        //     const fileName = file.filename;
-        //     if(comercio?.imagenPath){
-        //         await fs.unlink(path.resolve(comercio.imagenPath))
-        //         .then(async()=>{
-        //             await ComercioModel.findByIdAndUpdate(id, 
-        //                 {
-        //                     ...rest,
-        //                     imagenPath: file.path,
-        //                     imagen: `${Config.baseUrl}/uploads/${fileName}`
-        //                 }).then((ok)=>{
-        //                 return res.status(200).json({msg: 'Comercio Actualizado'}); 
-        //             })
-        //             .catch((err)=>{
-        //                 return res.status(404).json({msg: 'No se pudo actualizar'});
-        //             })
-        //         })
-        //         .catch(async(err)=> {
-        //             await ComercioModel.findByIdAndUpdate(id, 
-        //                 {
-        //                     ...rest,
-        //                     imagenPath: file.path,
-        //                     imagen: `${Config.baseUrl}/uploads/${fileName}`
-        //                 }).then((ok)=>{
-        //                 return res.status(200).json({msg: 'Comercio Actualizado'}); 
-        //             })
-        //             .catch((err)=>{
-        //                 return res.status(404).json({msg: 'No se pudo actualizar'});
-        //             })
-        //         })
-        //     }
-        //     else{
-        //         await ComercioModel.findByIdAndUpdate(id, 
-        //             {
-        //                 ...rest,
-        //                 imagenPath: file.path,
-        //                 imagen: `${Config.baseUrl}/uploads/${fileName}`
-        //             }).then((ok)=>{
-        //             return res.status(200).json({msg: 'Comercio Actualizado'}); 
-        //         })
-        //         .catch((err)=>{
-        //             return res.status(404).json({msg: 'No se pudo actualizar'});
-        //         })
-        //     }
-        // }
-        // else{
-        //     console.log("No trae file")
-        //     await ComercioModel.findByIdAndUpdate(id, rest).then((ok)=>{
-        //         return res.status(200).json({msg: 'Comercio Actualizado'}); 
-        //     })
-        //     .catch((err)=>{
-        //         return res.status(404).json({msg: 'No se pudo actualizar'});
-        //     }) 
-        // }
     }
 
     public async actualizarHorarioComercio(req: any, res: Response){
@@ -571,41 +517,65 @@ class ComercioController{
             const cantidadPedidos: number = pedidos.length;
             let totalIngresoDiario: number = 0;
             let pedidosDelDia: any[] = [];
+
+            const date = new Date();
+            const dateActual = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()));
+            const day = dateActual.getDate();
+            const mes =  dateActual.getUTCMonth();
+            const year =  dateActual.getFullYear();
+            const dayString = dateActual.getDay();
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+            const fechaHoy = `${dias[dayString]} ${day}/${mes + 1}/${year}`;
+
             await Promise.all(
                 pedidos.map(async(pedido)=>{
                     if(pedido._id){
                         //await Pedido.findByIdAndDelete(pedido._id);
                         const usuario = await Cliente.findById(pedido.clienteId)
+                        let hora = pedido.createdAt.getHours() < 10 ? ('0'+pedido.createdAt.getHours()): pedido.createdAt.getHours();
+                        let min = pedido.createdAt.getMinutes() < 10 ? ('0'+pedido.createdAt.getMinutes()): pedido.createdAt.getMinutes();
+                        const fecha = `${hora}:${min}`;
                         totalIngresoDiario = totalIngresoDiario + pedido.total;
                         pedidosDelDia.push({
                             pedidoId: pedido.idPedido,
-                            pagoEfectivo: pedido.configuracion.pagoEfectivo,
-                            pagoDigital: pedido.configuracion.pagoDigital,
+                            pagoDigital: pedido.configuracion.pagoDigital ? 'Digital' : 'Efectivo',
                             items: pedido.items,
-                            total: pedido.total,
-                            fecha: pedido.createdAt,
+                            total: formatter.format(pedido.total),
+                            fecha: fecha,
                             nombreCliente: usuario.nombre,
                         })
                     } 
                 }) 
             ) 
 
-            const options: CreateOptions = {
-                "format": "A4",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
-                "orientation": "portrait", // portrait or landscape
-            }
+            const html = fs.readFileSync(path.resolve('templates/cierreCaja.html'), "utf8");
 
-            const content = crearHtmlCierreCaja(totalIngresoDiario,cantidadPedidos,pedidosDelDia);
-
-            pdf.create(content, options).toStream((err: any, stream) => {
-                if (err) {
-                    console.log("Err")
-                    return res.end(err.stack)
-                }
-                res.setHeader('Content-type', 'application/pdf')
-                return stream.pipe(res)
-               
+            const options = {
+              orientation: "portrait",
+              border: "10mm",
+              height: '600',
+              width: '512', 
+            };
+      
+            const document = {
+              html: html,
+              data: {
+                productos: pedidosDelDia,
+                totalIngresoDiario: formatter.format(totalIngresoDiario),
+                fechaHoy: fechaHoy,
+              },
+              type: "stream",
+            };
+      
+            pdf.create(document, options)
+            .then((doc: any) => {
+              res.setHeader('Content-type', 'application/pdf');
+              return doc.pipe(res);
             })
+            .catch((error: any) => {
+              console.log(error);
+              return res.status(500).send(error);
+            });
         }
         else{
             return res.status(404).json({

@@ -1,19 +1,13 @@
 import { Request, Response } from 'express';
-import keys from '../keys';
-import jwt from 'jsonwebtoken';
-import Usuario from '../models/Usuario';
 import Pedido from '../models/Pedido';
 import Comercio from '../models/Comercio';
 import { SeguimientoEnum } from '../models/enum/tipo-estado.enum';
 import Cliente from '../models/Cliente';
-//import pdf, { CreateOptions } from 'html-pdf';
-//import { crearHtmlPedido } from '../libs/generatePdf';
-//import { ensureSymlinkSync } from 'fs-extra';
 import fs from 'fs-extra';
 import path from 'path';
 import pdf from 'pdf-creator-node'
 import { formatter } from '../libs/calculos';
-//const pdf = require("pdf-creator-node");
+
 
 class PedidosController {
   public async crearPedido(req: Request, res: Response) {
@@ -281,7 +275,6 @@ class PedidosController {
       pdf.create(document, options)
       .then((doc: any) => {
         res.setHeader('Content-type', 'application/pdf');
-        console.log(doc)
         return doc.pipe(res);
       })
       .catch((error: any) => {
@@ -292,24 +285,6 @@ class PedidosController {
       console.log('Err: ', error);
       return res.status(500).send(error);
     }
-
-    // const options: CreateOptions = {
-    //   // allowed units: A3, A4, A5, Legal, Letter, Tabloid
-    //   orientation: 'portrait',
-    //   height: '600',
-    //   width: '512', // portrait or landscape
-    // };
-
-    // const content = crearHtmlPedido(pedido);
-
-    // pdf.create(content, options).toStream((err: any, stream) => {
-    //   if (err) {
-    //     console.log('Err');
-    //     return res.end(err.stack);
-    //   }
-    //   res.setHeader('Content-type', 'application/pdf');
-    //   return stream.pipe(res);
-    // });
   }
 }
 
