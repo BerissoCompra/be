@@ -551,10 +551,11 @@ class ComercioController{
             const html = fs.readFileSync(path.resolve('templates/cierreCaja.html'), "utf8");
 
             const options = {
+              format: "A4",
               orientation: "portrait",
               border: "10mm",
-              height: '600',
-              width: '512', 
+            //   height: '600',
+            //   width: '512', 
             };
       
             const document = {
