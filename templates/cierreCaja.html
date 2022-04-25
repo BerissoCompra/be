@@ -9,30 +9,30 @@
     </style>
   </head>
   <body style="font-family: Arial">
-    <h1 style="text-align: center;">Cierre {{this.fechaHoy}}</h1>
+    <h1 style="text-align: center; font-family: Arial">Cierre {{this.fechaHoy}}</h1>
     <table style="width: 100%; border: 0.063rem solid #000; border-collapse: collapse; margin: 0 auto;">
       <tr>
-        <th style="border: 0.063rem solid #000;">Pedido #Id</th>
-        <th style="border: 0.063rem solid #000;">Horario</th>
-        <th style="border: 0.063rem solid #000;">Items</th>
-        <th style="border: 0.063rem solid #000;">Total</th> 
-        <th style="border: 0.063rem solid #000;">Tipo pago</th>
-        <th style="border: 0.063rem solid #000;">Cliente</th>  
+        <th style="border: 0.063rem solid #000; font-family: Arial">Pedido #Id</th>
+        <th style="border: 0.063rem solid #000; font-family: Arial">Horario</th>
+        <th style="border: 0.063rem solid #000; font-family: Arial">Items</th>
+        <th style="border: 0.063rem solid #000; font-family: Arial">Total</th> 
+        <th style="border: 0.063rem solid #000; font-family: Arial">Tipo pago</th>
+        <th style="border: 0.063rem solid #000; font-family: Arial">Cliente</th>  
       </tr>
       {{#each productos}}
       <tr style="height: 1.563rem;">
-        <td style="text-align: center; border: 0.063rem solid #000;">{{this.pedidoId}}</td>
-        <td style="text-align: center; border: 0.063rem solid #000;">{{this.fecha}}</td>
-        <td style="text-align: center; border: 0.063rem solid #000;">x{{this.items}}</td>
-        <td style="text-align: center; border: 0.063rem solid #000;">{{this.total}}</td>
-        <td style="text-align: center; border: 0.063rem solid #000;">{{this.pagoDigital}}</td>
-        <td style="text-align: center; border: 0.063rem solid #000;">{{this.nombreCliente}}</td>
+        <td style="text-align: center; border: 0.063rem solid #000; font-family: Arial">{{this.pedidoId}}</td>
+        <td style="text-align: center; border: 0.063rem solid #000; font-family: Arial">{{this.fecha}}</td>
+        <td style="text-align: center; border: 0.063rem solid #000; font-family: Arial">x{{this.items}}</td>
+        <td style="text-align: center; border: 0.063rem solid #000; font-family: Arial">{{this.total}}</td>
+        <td style="text-align: center; border: 0.063rem solid #000; font-family: Arial">{{this.pagoDigital}}</td>
+        <td style="text-align: center; border: 0.063rem solid #000; font-family: Arial">{{this.nombreCliente}}</td>
         </tr>
       {{/each}}
     </table>
-    <footer style="margin-top: 50px; bottom: 2rem;">
-        <p style="font-size: 1.25rem; padding: 0; margin: 0;">Total Ingresos: {{this.totalIngresoDiario}}</p>
-        <p style="font-size: 0.75rem; padding: 0; margin: 0; color: #9E9E9E;">2022 &copy Ciudad - App</p>
+    <footer style="margin-top: 50px; bottom: 2rem; font-family: Arial">
+        <p style="font-size: 1.25rem; padding: 0; margin: 0; font-family: Arial">Total Ingresos: {{this.totalIngresoDiario}}</p>
+        <p style="font-size: 0.75rem; padding: 0; margin: 0; color: #9E9E9E; font-family: Arial">2022 &copy Ciudad - App</p>
     </footer>
   </body>
 </html>

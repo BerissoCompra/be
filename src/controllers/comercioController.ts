@@ -554,8 +554,6 @@ class ComercioController{
               format: "A4",
               orientation: "portrait",
               border: "10mm",
-            //   height: '600',
-            //   width: '512', 
             };
       
             const document = {
