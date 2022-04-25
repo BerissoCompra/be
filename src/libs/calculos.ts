@@ -67,7 +67,7 @@ export const crearHtmlPedido = (pedido: any): string=>{
             <td style="text-align: center; border: 0.063rem solid #000; font-size: 0.75rem;">${formatter.format(producto.precioTotal)}</td>
         </tr>
         `
-    })
+    }) 
 
     const content = `
     <div style="padding: 1.25rem; font-family: Arial, Helvetica, sans-serif;">
@@ -94,15 +94,16 @@ export const crearHtmlPedido = (pedido: any): string=>{
         <footer style="position: absolute; bottom: 2rem;">
             <p style="font-size: 1.125rem; padding: 0; margin: 0;">Total Pedido: ${formatter.format(pedido.total)}</p>
             <p style="font-size: 0.75rem; padding: 0; margin: 0; color: #9E9E9E;">${year} &copy Ciudad - App</p>
-        </footer>
-    </div>
+        </footer> 
+    </div> 
     `;
 
     return content;
 }
 
-const formatter = new Intl.NumberFormat('en-US', {
+export const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2
-  })
+})
+ 

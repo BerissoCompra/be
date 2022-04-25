@@ -12,6 +12,7 @@ import Cliente from '../models/Cliente';
 import fs from 'fs-extra';
 import path from 'path';
 import pdf from 'pdf-creator-node'
+import { formatter } from '../libs/calculos';
 //const pdf = require("pdf-creator-node");
 
 class PedidosController {
@@ -251,53 +252,37 @@ class PedidosController {
     const pedido = await Pedido.findById(id);
 
     try {
-      const html = fs.readFileSync(path.resolve('pedido.html'), "utf8");
+      const html = fs.readFileSync(path.resolve('templates/pedido.html'), "utf8");
 
       const options = {
-        format: "A3",
         orientation: "portrait",
         border: "10mm",
-        header: {
-            height: "45mm",
-            contents: '<div style="text-align: center;">Author: Shyam Hajare</div>'
-        },
-        footer: {
-            height: "28mm",
-            contents: {
-                first: 'Cover page',
-                2: 'Second page', // Any page number is working. 1-based index
-                default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>', // fallback value
-                last: 'Last Page'
-            }
-        }
+        height: '600',
+        width: '512', 
       };
-      const users = [
-        {
-          name: "Shyam",
-          age: "26",
-        },
-        {
-          name: "Navjot",
-          age: "26",
-        },
-        { 
-          name: "Vitthal",
-          age: "26",
-        },
-      ];
 
       const document = {
         html: html,
         data: {
+          idPedido: pedido.idPedido,
+          direccion: pedido.configuracion.direccion,
+          numDep: pedido.configuracion.numDep,
+          direccionInfo: pedido.configuracion.direccionInfo,
+          productos: pedido.productos,
+          envio: pedido.configuracion.envio, 
+          pagoDigital: pedido.configuracion.pagoDigital,
+          total: formatter.format(pedido.total),  
+          pagaCon: formatter.format(pedido.configuracion.pagaCon),
+          vuelto: formatter.format(pedido.configuracion.pagaCon - pedido.total)
         },
-        path: "./output.pdf",
-        type: "",
+        type: "stream",
       };
-  
+
       pdf.create(document, options)
       .then((doc: any) => {
         res.setHeader('Content-type', 'application/pdf');
-        return res.sendFile(doc.filename.toString());
+        console.log(doc)
+        return doc.pipe(res);
       })
       .catch((error: any) => {
         console.log(error);

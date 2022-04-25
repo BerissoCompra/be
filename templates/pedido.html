@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      .body{
+        background-color: #000;
+      }
+    </style>
+  </head>
+  <body style="font-family: Arial">
+    <h1 style="text-align: center; font-size: 1.25rem;"># {{this.idPedido}}</h1>
+    <table style="width: 100%; border: 0.063rem solid #000; border-collapse: collapse; margin: 0 auto;">
+      <tr>
+          <th style="border: 0.063rem solid #000; font-size: 0.75rem;">Producto</th>
+          <th style="border: 0.063rem solid #000; font-size: 0.75rem;">Cantidad</th>
+          <th style="border: 0.063rem solid #000; font-size: 0.75rem;">Total</th> 
+      </tr>
+      {{#each productos}}
+      <tr style="height: 1.563rem;">
+        <td style="text-align: center; border: 0.063rem solid #000; font-size: 0.75rem;">{{this.producto.nombre}}</td>
+        <td style="text-align: center; border: 0.063rem solid #000; font-size: 0.75rem;">x{{this.cantidad}}</td>
+        <td style="text-align: center; border: 0.063rem solid #000; font-size: 0.75rem;">${{this.precioTotal}}</td>
+      </tr> 
+      {{/each}}
+    </table>
+
+    <div style="margin-top: 1.25rem; margin-bottom: 1.25rem; font-family: Arial">
+      <p style="font-size: 0.75rem; padding: 0; margin: 0; text-align: left;">Tipo de entrega: 
+        {{#ifCond this.envio "==" true}}
+        <span>
+          A domicilio
+        </span>
+        {{/ifCond}}
+        {{#ifCond this.envio "==" false}}
+        <span>
+          Retira en el local
+        </span>
+        {{/ifCond}}
+      </p>
+
+      <p style="font-size: 0.75rem; padding: 0; margin: 0; text-align: left;">Método de pago: 
+        {{#ifCond this.pagoDigital "==" true}}
+        <span>
+          Digital
+        </span>
+        {{/ifCond}}
+        {{#ifCond this.pagoDigital "==" false}}
+        <span>
+          Efectivo
+        </span>
+        {{/ifCond}}
+      </p>
+
+      {{#ifCond this.pagoDigital "==" false}}
+        <p style="font-size: 0.75rem; padding: 0; margin: 0; text-align: left;">Abona con: 
+          {{this.pagaCon}}
+        </p>
+        <p style="font-size: 0.75rem; padding: 0; margin: 0; text-align: left;">Vuelto: 
+          {{this.vuelto}}
+        </p>
+      {{/ifCond}}
+      
+     
+      <!-- <p style="font-size: 0.75rem; padding: 0; margin: 0; text-align: left;">Forma de pago: ${pedido.configuracion.pagoDigital ? 'Digital' : 'Efectivo'}</p>
+      <p style="font-size: 0.75rem; padding: 0; margin: 0; text-align: left;">Abona con: ${pedido.configuracion.pagoEfectivo && pedido.configuracion.pagaCon ? formatter.format(pedido.configuracion.pagaCon) : '-'}</p>
+      <p style="font-size: 0.75rem; padding: 0; margin: 0; text-align: left;">Vuelto: ${pedido.configuracion.pagoEfectivo && pedido.configuracion.pagaCon ? formatter.format(pedido.configuracion.pagaCon - pedido.total) : '-'}</p> -->
+    </div>
+
+    <div style="margin-top: 20px; width: 100%; padding: 0; font-family: Arial">
+      <p style="font-size: 0.75rem; padding: 0; margin: 0;">Dirección: {{this.direccion}}</p>
+      <p style="font-size: 0.75rem; padding: 0; margin: 0;">Núm / Dpto: {{this.numDep}}</p>
+      <p style="font-size: 0.75rem; padding: 0; margin: 0;">Info adicional: {{this.direccionInfo}}</p>
+    </div>
+
+
+    <footer style="margin-top: 50px; bottom: 2rem; font-family: Arial">
+      <p style="font-size: 1.125rem; padding: 0; margin: 0;">Total Pedido: {{this.total}}</p>
+      <p style="font-size: 0.75rem; padding: 0; margin: 0; color: #9E9E9E;">2022 &copy Ciudad - App</p>
+    </footer>
+  </body>
+</html>
