@@ -10,46 +10,61 @@ import { Config } from '../config/api.config';
 class PublicidadController{
      
     public async obtenerPublicidad(req: any, res: Response){
-        const {tipo} = req.params;
-        var rand = Math.random();
-        const publicidades = await Publicidad.find({tipo}).sort({ rand: 1 })
-        let response: any[] = [];
-        if(publicidades.length > 0){
-            await Promise.all(publicidades.map(async(publicidad: PublicidadInterface)=>{
-                if(publicidad.tipoPublicidad === TipoClientePublicidad.COMERCIO){
-                    const comercio = await Comercio.findById(publicidad.comercioId)
-                    response = [{comercio, tipoPublicidad: publicidad.tipoPublicidad}, ...response]
-                }
-                else if(publicidad.tipoPublicidad === TipoClientePublicidad.EXTERNO){
-                    response = [publicidad, ...response]
-                }
-            }))
-            return res.status(200).json(response)
+        try {
+            const {tipo} = req.params;
+            var rand = Math.random();
+            const publicidades = await Publicidad.find({tipo}).sort({ rand: 1 })
+            let response: any[] = [];
+            if(publicidades.length > 0){
+                await Promise.all(publicidades.map(async(publicidad: PublicidadInterface)=>{
+                    if(publicidad.tipoPublicidad === TipoClientePublicidad.COMERCIO){
+                        const comercio = await Comercio.findById(publicidad.comercioId)
+                        response = [{comercio, tipoPublicidad: publicidad.tipoPublicidad}, ...response]
+                    }
+                    else if(publicidad.tipoPublicidad === TipoClientePublicidad.EXTERNO){
+                        response = [publicidad, ...response]
+                    }
+                }))
+                return res.status(200).json(response)
+            }
+            return res.status(200).json([])
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({msg: 'Error'})
         }
-        return res.status(200).json([])
     }
 
     public async getAllPublicidad(req: any, res: Response){
-        const publicidades = await Publicidad.find({});
-        if(publicidades.length > 0){
-            return res.status(200).json(publicidades)
+        try {
+            const publicidades = await Publicidad.find({});
+            if(publicidades.length > 0){
+                return res.status(200).json(publicidades)
+            }
+            return res.status(200).json([])
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({msg: 'Error'})
         }
-        return res.status(200).json([])
     }
 
     public async agregarComerciosPublicidad(req: any, res: Response){
-        const {comercioId, tipo} = req.body;
-        const comercio = await Comercio.findById(comercioId);
-        const publicidad = await new Publicidad({descripcion: comercio.nombre, comercioId, tipo, tipoPublicidad: TipoClientePublicidad.COMERCIO})
-        await publicidad.save()
-        .then(()=>{
-            return res.status(200).json({msg: 'ok'})
-        })
-        .catch((err: any)=>{
-            console.log(err)
-            return res.status(404).json({msg: 'Error al agregar comercio a Publicidad'})
-        })
-       
+        try {
+            const {comercioId, tipo} = req.body;
+            const comercio = await Comercio.findById(comercioId);
+            const publicidad = await new Publicidad({descripcion: comercio.nombre, comercioId, tipo, tipoPublicidad: TipoClientePublicidad.COMERCIO})
+            await publicidad.save()
+            .then(()=>{
+                return res.status(200).json({msg: 'ok'})
+            })
+            .catch((err: any)=>{
+                console.log(err)
+                return res.status(404).json({msg: 'Error al agregar comercio a Publicidad'})
+            })
+        
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({msg: 'Error'})
+        }
     }
 
     public async eliminarComerciosPublicidad(req: any, res: Response){

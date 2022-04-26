@@ -32,7 +32,13 @@ class CategoriasController {
     try {
       const { tipo } = req.params;
       const categorias = await CategoriaModel.find({ tipo });
-      return res.status(200).json(categorias);
+      if(categorias.length > 0){
+        return res.status(200).json(categorias);
+      }
+      else{
+        return res.status(200).json([]);
+      }
+      
     } 
     catch (error) {
       return res
