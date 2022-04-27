@@ -5,9 +5,8 @@ import { SeguimientoEnum } from '../models/enum/tipo-estado.enum';
 import Cliente from '../models/Cliente';
 import fs from 'fs-extra';
 import path from 'path';
-import pdf from 'pdf-creator-node'
+import pdf from 'pdf-creator-node';
 import { formatter } from '../libs/calculos';
-
 
 class PedidosController {
   public async crearPedido(req: Request, res: Response) {
@@ -113,15 +112,15 @@ class PedidosController {
       const pedidos = await Pedido.find({ comercioId: id, estado: estado });
       let pedidosResponse: any[] = [];
       await Promise.all(
-        pedidos.map(async(pedido)=>{
+        pedidos.map(async (pedido) => {
           const usuarioCliente = await Cliente.findById(pedido.clienteId);
-          const {password, ...rest} = usuarioCliente._doc;
+          const { password, ...rest } = usuarioCliente._doc;
           pedidosResponse.push({
             ...pedido._doc,
-            cliente: rest
-          })
-        })
-      )
+            cliente: rest,
+          });
+        }),
+      );
 
       if (pedidosResponse) {
         return res.status(200).json(pedidosResponse);
@@ -214,8 +213,11 @@ class PedidosController {
   public async rechazarPedido(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const {motivo} = req.body;
-      const pedido = await Pedido.findByIdAndUpdate(id, {estado: SeguimientoEnum.RECHAZADO, motivoRechazo: motivo});
+      const { motivo } = req.body;
+      const pedido = await Pedido.findByIdAndUpdate(id, {
+        estado: SeguimientoEnum.RECHAZADO,
+        motivoRechazo: motivo,
+      });
       if (pedido) {
         return res.status(200).json({ _id: pedido._id });
       }
@@ -246,13 +248,16 @@ class PedidosController {
     const pedido = await Pedido.findById(id);
 
     try {
-      const html = fs.readFileSync(path.resolve('templates/pedido.html'), "utf8");
+      const html = fs.readFileSync(
+        path.resolve('templates/pedido.html'),
+        'utf8',
+      );
 
       const options = {
-        orientation: "portrait",
-        border: "10mm",
+        orientation: 'portrait',
+        border: '10mm',
         height: '600',
-        width: '512', 
+        width: '512',
       };
 
       const document = {
@@ -263,24 +268,25 @@ class PedidosController {
           numDep: pedido.configuracion.numDep,
           direccionInfo: pedido.configuracion.direccionInfo,
           productos: pedido.productos,
-          envio: pedido.configuracion.envio, 
+          envio: pedido.configuracion.envio,
           pagoDigital: pedido.configuracion.pagoDigital,
-          total: formatter.format(pedido.total),  
+          total: formatter.format(pedido.total),
           pagaCon: formatter.format(pedido.configuracion.pagaCon),
-          vuelto: formatter.format(pedido.configuracion.pagaCon - pedido.total)
+          vuelto: formatter.format(pedido.configuracion.pagaCon - pedido.total),
         },
-        type: "stream",
+        type: 'stream',
       };
 
-      pdf.create(document, options)
-      .then((doc: any) => {
-        res.setHeader('Content-type', 'application/pdf');
-        return doc.pipe(res);
-      })
-      .catch((error: any) => {
-        console.log(error);
-        return res.status(500).send(error);
-      });
+      pdf
+        .create(document, options)
+        .then((doc: any) => {
+          res.setHeader('Content-type', 'application/pdf');
+          return doc.pipe(res);
+        })
+        .catch((error: any) => {
+          console.log(error);
+          return res.status(500).send(error);
+        });
     } catch (error) {
       console.log('Err: ', error);
       return res.status(500).send(error);

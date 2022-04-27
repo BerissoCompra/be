@@ -9,7 +9,9 @@ class ServiciosController {
       const servicio = new ServicioModel(body);
       //   console.log(servicio);
       await servicio.save();
-      return res.status(200).json({ msg: 'Servicio creado correctamente', id: servicio._id });
+      return res
+        .status(200)
+        .json({ msg: 'Servicio creado correctamente', id: servicio._id });
     } catch (error) {
       return res.status(400).json({ msg: 'Hubo un error', error });
       console.error(error);
@@ -76,6 +78,28 @@ class ServiciosController {
     } catch (error) {
       return res.status(400).json({ msg: 'Hubo un error', error });
       console.error(error);
+    }
+  }
+
+  public async activarServicio(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      await ServicioModel.updateOne({ _id: id }, { activado: true });
+      return res.status(200).json({ ok: true });
+    } catch (error) {
+      return res.status(400).json({ msg: 'Hubo un error', error });
+      console.error(error);
+    }
+  }
+
+  public async desactivarServicio(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      await ServicioModel.updateOne({ _id: id }, { activado: false });
+      return res.status(200).json({ ok: true });
+    } catch (err) {
+      return res.status(404).json({ msg: 'No se pudo actualizar', err });
+      console.error(err);
     }
   }
 }

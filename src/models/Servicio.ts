@@ -4,13 +4,15 @@ const ServicioSchema = new Schema(
   {
     nombre: {
       type: String,
-      required: true,
       trim: true,
     },
-    categoria: {
+    categoría: {
       type: String,
       trim: true,
-      required: true,
+    },
+    activado: {
+      type: Boolean,
+      default: false,
     },
     prioridad: {
       type: String,
@@ -42,14 +44,9 @@ const ServicioSchema = new Schema(
       type: String,
       trim: true,
     },
-    imagenPath: {
-      type: String,
-      trim: true,
-    },
     contacto: {
       type: String,
       trim: true,
-      required: true,
     },
   },
   {

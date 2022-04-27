@@ -24,6 +24,8 @@ class ServiciosRoutes {
     //PUT
 
     this.router.put('/:id', serviciosController.actualizarServicioById);
+    this.router.put('/:id/activar', serviciosController.activarServicio);
+    this.router.put('/:id/desactivar', serviciosController.desactivarServicio);
 
     //DELETE
 
