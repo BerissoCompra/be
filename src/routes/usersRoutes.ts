@@ -26,6 +26,11 @@ class UsersRoutes {
       '/codigoverificacion',
       usersController.EnviarCodigoVerificacion,
     );
+    this.router.post(
+      '/validar',
+      [verifyToken],
+      usersController.validarUsuario,
+    );
     this.router.post('/cliente/signin', usersController.iniciarSesionCliente);
     this.router.post('/cliente/signup', usersController.crearUsuarioCliente);
     this.router.post(
@@ -33,7 +38,6 @@ class UsersRoutes {
       [verifyToken],
       usersController.verificarUsuario,
     );
-
     //PUT
     this.router.put('/:id/accountverify', usersController.VerificarCuenta);
     this.router.put('/verificarCodigo', usersController.verificarCodigo);

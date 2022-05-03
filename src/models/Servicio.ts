@@ -6,6 +6,10 @@ const ServicioSchema = new Schema(
       type: String,
       trim: true,
     },
+    usuarioId: {
+      type: String,
+      trim: true,
+    },
     categoría: {
       type: String,
       trim: true,

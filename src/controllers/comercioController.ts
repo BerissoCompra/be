@@ -12,12 +12,24 @@ import Pedido from '../models/Pedido';
 
 import { formatter } from '../libs/calculos';
 import pdf from 'pdf-creator-node';
+import { RolesEnum } from '../models/enum/roles';
 
 class ComercioController {
-  public async crearComercio(req: Request, res: Response) {
+  public async crearComercio(req: any, res: Response) {
     try {
+
+      const { uid } = req.data;
+      const usuario = await Usuario.findByIdAndUpdate(uid, {
+        rol: RolesEnum.USUARIO
+      });
+      
+      if(!usuario) return res.status(404).json({msg: 'El usuario no existe'})
+
+      const usuarioId = uid;
+
       const comercio = new ComercioModel({
         ...req.body,
+        usuarioId,
         imagen:
           'https://www.uifrommars.com/wp-content/uploads/2018/08/crear-paleta-colores-diseno-ui.jpg',
       });

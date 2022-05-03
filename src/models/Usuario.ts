@@ -43,7 +43,7 @@ const UsuarioSchema = new Schema({
     }, 
     rol: {
         type: String,
-        default: 'usuario',
+        default: 'nuevo',
         trim: true,
         required: true,
     },

@@ -7,6 +7,8 @@ import Comercio from '../models/Comercio';
 import CodigosRecuperacion from '../models/CodigosRecuperacion';
 import { sendEmail } from '../config/mailer';
 import { Config } from '../config/api.config';
+import Servicio from '../models/Servicio';
+import { RolesEnum } from '../models/enum/roles';
 
 class UsersController{
 
@@ -25,23 +27,40 @@ class UsersController{
                 token: null,
                 msg: "El usuario y/o contraseña son incorrectos",
             });
-
-            let activado: boolean = await usuarioExiste.emailActivado;
-            let  data = JSON.stringify({uid: usuarioExiste._id});
-
-            if(usuarioExiste.rol){
-                data = JSON.stringify({uid: usuarioExiste._id, rol: usuarioExiste?.rol});
-                activado = true;
-            }
+            //TODO BORRAR ESTE COMENTARIO
+            //let activado: boolean = await usuarioExiste.emailActivado;
+            let data = JSON.stringify({uid: usuarioExiste._id,  rol: usuarioExiste.rol});
 
             const token = jwt.sign(data, keys.seckey)
 
-            return await res.status(200).json({token: token, activado});
+            return await res.status(200).json({token: token, activado: true});
 
         } catch (error) {
             console.log(error);
             return await res.status(500).json({msg: 'Error al autenticar'});
         }
+    }
+
+    public async validarUsuario(req: any, res: Response){
+        const {uid} = req.data;
+
+        try {
+            const usuario = await Usuario.findById(uid);
+            const comercioUsuario = await Comercio.findOne({usuarioId: uid});
+            const servicioUsuario = await Servicio.findOne({usuarioId: uid})
+
+            if(!comercioUsuario?._id && !servicioUsuario?._id){
+                return res.status(200).json({servicio: false})
+            }
+            else{
+                const data = JSON.stringify({uid, rol: usuario?.rol});
+                const token = jwt.sign(data, keys.seckey)
+                return res.status(200).json({token, servicio: true})
+            }
+        } catch (error) {
+            return res.status(500).json({msg: 'Error al validar usuario'})
+        }
+
     }
 
     public async iniciarSesionCliente(req: Request, res: Response){

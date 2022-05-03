@@ -67,7 +67,7 @@ class ComerciosRoutes {
     );
 
     //POST
-    this.router.post('/new', comercioController.crearComercio);
+    this.router.post('/', [verifyToken] ,comercioController.crearComercio);
 
     //PUT
     this.router.put(
