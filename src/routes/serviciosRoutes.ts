@@ -1,9 +1,6 @@
 import { NextFunction, Router } from 'express';
 import { serviciosController } from '../controllers/serviciosController';
-// import keys from '../keys';
-// import jwt from 'jsonwebtoken';
-// import multer from '../libs/multer';
-// import { verifyToken } from '../middlewares/auth';
+import { verifyToken } from '../middlewares/auth';
 
 class ServiciosRoutes {
   public router: Router = Router();
@@ -15,21 +12,45 @@ class ServiciosRoutes {
     // GET
 
     this.router.get('/', serviciosController.obtenerServicios);
-    this.router.get('/:id', serviciosController.obtenerServicioById);
+    this.router.get(
+      '/:id',
+      [verifyToken],
+      serviciosController.obtenerServicioById,
+    );
 
     //POST
 
-    this.router.post('/crear', serviciosController.crearServicio);
+    this.router.post(
+      '/crear',
+      [verifyToken],
+      serviciosController.crearServicio,
+    );
 
     //PUT
 
-    this.router.put('/:id', serviciosController.actualizarServicioById);
-    this.router.put('/:id/activar', serviciosController.activarServicio);
-    this.router.put('/:id/desactivar', serviciosController.desactivarServicio);
+    this.router.put(
+      '/:id',
+      [verifyToken],
+      serviciosController.actualizarServicioById,
+    );
+    this.router.put(
+      '/:id/activar',
+      [verifyToken],
+      serviciosController.activarServicio,
+    );
+    this.router.put(
+      '/:id/desactivar',
+      [verifyToken],
+      serviciosController.desactivarServicio,
+    );
 
     //DELETE
 
-    this.router.delete('/:id', serviciosController.deleteServicio);
+    this.router.delete(
+      '/:id',
+      [verifyToken],
+      serviciosController.deleteServicio,
+    );
   }
 }
 

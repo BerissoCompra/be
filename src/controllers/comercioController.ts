@@ -17,13 +17,14 @@ import { RolesEnum } from '../models/enum/roles';
 class ComercioController {
   public async crearComercio(req: any, res: Response) {
     try {
-
       const { uid } = req.data;
+      console.log(req.data);
       const usuario = await Usuario.findByIdAndUpdate(uid, {
-        rol: RolesEnum.USUARIO
+        rol: RolesEnum.USUARIO,
       });
-      
-      if(!usuario) return res.status(404).json({msg: 'El usuario no existe'})
+
+      if (!usuario)
+        return res.status(404).json({ msg: 'El usuario no existe' });
 
       const usuarioId = uid;
 

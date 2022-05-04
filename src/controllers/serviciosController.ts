@@ -1,12 +1,24 @@
 import { Request, Response } from 'express';
+import { RolesEnum } from '../models/enum/roles';
 import ServicioModel from '../models/Servicio';
+import Usuario from '../models/Usuario';
 
 class ServiciosController {
-  public async crearServicio(req: Request, res: Response) {
+  public async crearServicio(req: any, res: Response) {
     try {
-      const body = req.body;
+      const { uid } = req.data;
+      const usuario = await Usuario.findByIdAndUpdate(uid, {
+        rol: RolesEnum.SERVICIO,
+      });
 
-      const servicio = new ServicioModel(body);
+      const usuarioId = uid;
+
+      const servicio = new ServicioModel({
+        ...req.body,
+        usuarioId,
+        imagen:
+          'https://www.uifrommars.com/wp-content/uploads/2018/08/crear-paleta-colores-diseno-ui.jpg',
+      });
       //   console.log(servicio);
       await servicio.save();
       return res

@@ -2,11 +2,15 @@ import { Schema, model } from 'mongoose';
 
 const ServicioSchema = new Schema(
   {
-    nombre: {
+    usuarioId: {
       type: String,
       trim: true,
     },
-    usuarioId: {
+    nombreResponsable: {
+      type: String,
+      trim: true,
+    },
+    nombreClasificado: {
       type: String,
       trim: true,
     },
