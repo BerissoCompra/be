@@ -14,6 +14,10 @@ const ServicioSchema = new Schema(
       type: String,
       trim: true,
     },
+    dias: [{
+      type: String,
+    }],
+    horarios: [], 
     categoría: {
       type: String,
       trim: true,

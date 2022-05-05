@@ -13,6 +13,7 @@ import Pedido from '../models/Pedido';
 import { formatter } from '../libs/calculos';
 import pdf from 'pdf-creator-node';
 import { RolesEnum } from '../models/enum/roles';
+import Servicio from '../models/Servicio';
 
 class ComercioController {
   public async crearComercio(req: any, res: Response) {
@@ -168,12 +169,26 @@ class ComercioController {
 
   public async obtenerComerciosByUserId(req: any, res: Response) {
     const { uid } = req.data;
-    const comercios = await ComercioModel.find({ usuarioId: uid });
-    if (comercios.length > 0) {
-      return res.status(200).json(comercios[0]);
-    } else {
-      return res.status(404).json({ msg: 'No se encontro el comercio' });
+
+    const usuario = await Usuario.findById(uid);
+
+    if(usuario.rol === RolesEnum.USUARIO){
+      const comercio = await ComercioModel.findOne({ usuarioId: uid });
+      if (comercio) {
+        return res.status(200).json(comercio);
+      } else {
+        return res.status(404).json({ msg: 'No se encontro el comercio' });
+      }
     }
+    if(usuario.rol === RolesEnum.SERVICIO){
+      const servicio = await Servicio.findOne({ usuarioId: uid });
+      if (servicio) {
+        return res.status(200).json(servicio);
+      } else {
+        return res.status(404).json({ msg: 'No se encontro el comercio' });
+      }
+    }
+    
   }
 
   public async searchComercio(req: any, res: Response) {
