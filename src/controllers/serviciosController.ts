@@ -59,6 +59,23 @@ class ServiciosController {
     }
   }
 
+  public async obtenerServicioByCategoria(req: Request, res: Response) {
+    console.log("sadasdsa")
+    try {
+      const { categoria } = req.params;
+      if (!categoria) return res.status(400).json({ msg: 'No existe esa categoria' });
+
+      const servicios = await ServicioModel.find({categoria});
+
+      return res
+        .status(200)
+        .json({ msg: 'Servicios obtenidos de manera correcta', servicios });
+    } catch (error) {
+      console.error(error);
+      return res.status(400).json({ msg: 'Hubo un error', error });
+    }
+  }
+
   public async actualizarServicioById(req: Request, res: Response) {
     try {
       const { id } = req.params;

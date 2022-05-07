@@ -18,6 +18,12 @@ class ServiciosRoutes {
       serviciosController.obtenerServicioById,
     );
 
+    this.router.get(
+      '/filtrar/categoria/:categoria',
+      [verifyToken],
+      serviciosController.obtenerServicioByCategoria,
+    );
+
     //POST
 
     this.router.post(
