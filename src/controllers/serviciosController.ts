@@ -60,7 +60,6 @@ class ServiciosController {
   }
 
   public async obtenerServicioByCategoria(req: Request, res: Response) {
-    console.log("sadasdsa")
     try {
       const { categoria } = req.params;
       if (!categoria) return res.status(400).json({ msg: 'No existe esa categoria' });

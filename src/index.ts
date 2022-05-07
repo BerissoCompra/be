@@ -16,6 +16,7 @@ import imagesRoutes from './routes/imagesRoutes';
 import publicidadRoutes from './routes/publicidadRoutes';
 import categoriasRoutest from './routes/categoriasRoutes';
 import serviciosRoutes from './routes/serviciosRoutes';
+import { CLEARDB, InitialSetup } from './config/scripts-db';
 
 const app = express();
 const server = http.createServer(app);
@@ -23,6 +24,7 @@ const io = new socketIo.Server(server, { cors: { origin: '*' } });
 
 //Db config
 connectDb();
+InitialSetup();
 
 //Config
 app.set('port', process.env.PORT || 3000);

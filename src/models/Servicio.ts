@@ -18,7 +18,7 @@ const ServicioSchema = new Schema(
       type: String,
     }],
     horarios: [], 
-    categoría: {
+    categoria: {
       type: String,
       trim: true,
     },
@@ -40,6 +40,15 @@ const ServicioSchema = new Schema(
     },
     monto: {
       type: String,
+    },
+    ubicacion: {
+      latitude: {
+        type: Number,
+      },
+      longitude: {
+        type: Number,
+      },
+      required: false, 
     },
     redes: {
       facebook: {

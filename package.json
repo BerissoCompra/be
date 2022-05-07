@@ -9,7 +9,8 @@
     "buildev": "tsc -w",
     "dev": "nodemon build/index.js",
     "e2e": "ng e2e",
-    "deploy": "node ./setVariables.cjs && tsc"
+    "deploy": "node ./setVariables.cjs && tsc",
+    "execscr": "node ./DBScripts.cjs"
   },
   "keywords": [],
   "author": "",

@@ -3,9 +3,11 @@ import CategoriaModel from '../models/Categorias';
 
 class CategoriasController {
   public async crearCategoria(req: Request, res: Response) {
-    const { descripcion, tipo } = req.body;
+    const { descripcion, tipo, valor } = req.body;
+
     try {
       const categoria = new CategoriaModel({
+        valor,
         descripcion,
         tipo,
       });
