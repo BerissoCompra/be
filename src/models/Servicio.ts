@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { TiposCategoriasEnum } from './enum/tipo-categorias';
 
 const ServicioSchema = new Schema(
   {
@@ -17,6 +18,11 @@ const ServicioSchema = new Schema(
     dias: [{
       type: String,
     }],
+    tipo: {
+      type: String,
+      trim: true,
+      default: TiposCategoriasEnum.SERVICIOS
+    },
     horarios: [], 
     categoria: {
       type: String,

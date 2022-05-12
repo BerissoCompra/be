@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { RolesEnum } from '../models/enum/roles';
+import { montoPorCategoria, TiposCategoriasEnum } from '../models/enum/tipo-categorias';
 import ServicioModel from '../models/Servicio';
 import Usuario from '../models/Usuario';
 
@@ -7,15 +8,39 @@ class ServiciosController {
   public async crearServicio(req: any, res: Response) {
     try {
       const { uid } = req.data;
+
       const usuario = await Usuario.findByIdAndUpdate(uid, {
         rol: RolesEnum.SERVICIO,
       });
 
+      let monto = 0;
+
+      switch (req.body?.tipo) {
+        case TiposCategoriasEnum.GASTRONOMICOS:
+          monto = 0;
+          break;
+          case TiposCategoriasEnum.EMPRENDEDORES:
+            monto = 1200;
+            break;
+            case TiposCategoriasEnum.PROFESIONALES:
+              monto = 1500;
+              break;
+              case TiposCategoriasEnum.SERVICIOS:
+                monto = 1200;
+                break;
+        default:
+          monto = 0;
+          break;
+      }
+
       const usuarioId = uid;
+
+      console.log(`El tipo del servicio es ${req.body?.tipo} y su monto ${monto}`)
 
       const servicio = new ServicioModel({
         ...req.body,
         usuarioId,
+        monto,
         imagen:
           'https://www.uifrommars.com/wp-content/uploads/2018/08/crear-paleta-colores-diseno-ui.jpg',
       });
